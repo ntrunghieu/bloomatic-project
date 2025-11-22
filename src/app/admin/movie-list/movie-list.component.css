@@ -1,0 +1,250 @@
+.table-card {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #ededee;
+  /* border: 1px solid #1f2937; */
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.55);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-header h2 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* nút outline */
+.btn-outline {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  font-size: 12px;
+  background: transparent;
+  color: black;
+  cursor: pointer;
+}
+
+/* bảng phim */
+.movie-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.movie-table th,
+.movie-table td {
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.movie-table thead th {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.movie-table tbody tr:nth-child(even) {
+  background-color: rgba(92, 112, 158, 0.6);
+}
+
+/* ===== PAGE LAYOUT ===== */
+
+.movie-page {
+  padding: 16px 20px;
+  background: #f3f4f6; /* nền xám nhạt như hình */
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+/* breadcrumb */
+.breadcrumb {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.breadcrumb .slash {
+  margin: 0 4px;
+}
+
+.breadcrumb .current {
+  color: #111827;
+  font-weight: 500;
+}
+
+/* nút trên header */
+.top-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-outline {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.btn-outline:hover {
+  background: #f9fafb;
+}
+
+/* ===== CARD + TABLE ===== */
+
+.movie-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  padding: 12px 16px 10px;
+  box-sizing: border-box;
+}
+
+/* table */
+.movie-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.movie-table thead {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.movie-table th,
+.movie-table td {
+  padding: 8px 6px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.movie-table th {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.movie-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.movie-table tbody tr:hover {
+  background-color: #eef2ff;
+}
+
+/* tên phim */
+.movie-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+/* ===== BADGES ===== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* thể loại – màu xanh nhạt */
+.badge-genre {
+  background: #e5edff;
+  color: #2563eb;
+  margin-right: 4px;
+  margin-bottom: 3px;
+}
+
+/* lịch chiếu – màu cam nhạt */
+.badge-date {
+  background: #fff1e6;
+  color: #ea580c;
+}
+
+/* trạng thái */
+.badge-status-open {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-status-hidden {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+/* ===== TABLE FOOTER + PAGINATION ===== */
+
+.table-footer {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-btn {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.page-size {
+  font-size: 12px;
+  color: #6b7280;
+}
+

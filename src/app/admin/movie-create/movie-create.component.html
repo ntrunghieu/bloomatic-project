@@ -1,0 +1,156 @@
+<div class="movie-create-page">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <span>Dashboard</span>
+        <span class="slash">/</span>
+        <span>Danh sách phim</span>
+        <span class="slash">/</span>
+        <span class="current">Tạo phim</span>
+    </div>
+
+    <!-- Nút trên cùng -->
+    <div class="top-actions">
+        <button class="btn btn-outline" routerLink="/admin/movies/list">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </button>
+        <button class="btn btn-primary" (click)="onSubmit()">
+            <i class="fa-solid fa-plus"></i> Tạo phim
+        </button>
+    </div>
+
+    <!-- Card form -->
+    <div class="movie-form-card">
+        <form [formGroup]="movieForm">
+            <div class="form-grid">
+                <!-- Cột trái -->
+                <div class="form-column">
+                    <div class="form-field">
+                        <label>
+                            Tên phim <span class="required">*</span>
+                        </label>
+                        <input type="text" formControlName="name" placeholder="Enter name">
+                    </div>
+
+                    <div class="form-field">
+                        <label>
+                            Tên phim (tiếng anh)
+                        </label>
+                        <input type="text" formControlName="englishName" placeholder="Enter english name">
+                    </div>
+
+                    <div class="form-field">
+                        <label>
+                            Trailer <span class="required">*</span>
+                        </label>
+                        <input type="text" formControlName="trailer" placeholder="Enter trailer">
+                    </div>
+
+                    <div class="form-field">
+                        <label>Mô tả</label>
+                        <textarea formControlName="description" rows="4" placeholder="Enter description"></textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Thể loại</label>
+                        <ng-select formControlName="genres" [items]="genreOptions" [multiple]="true"
+                            [closeOnSelect]="false" [searchable]="false" placeholder="Chọn thể loại">
+                        </ng-select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Đạo diễn</label>
+                        <ng-select formControlName="directors" [items]="directors" [multiple]="true"
+                            [closeOnSelect]="false" [searchable]="false" placeholder="Chọn đạo diễn">
+                        </ng-select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Diễn viên</label>
+                        <ng-select formControlName="actors" [items]="actors" [multiple]="true" [closeOnSelect]="false"
+                            [searchable]="false" placeholder="Chọn diễn viên">
+                        </ng-select>
+                    </div>
+                </div>
+
+                <!-- Cột phải -->
+                <div class="form-column">
+                    <div class="form-field">
+                        <label>
+                            Hình thức chiếu <span class="required">*</span>
+                        </label>
+                        <select formControlName="screenType">
+                            <option value="">Select a graphics</option>
+                            <option *ngFor="let s of screenTypes" [value]="s">{{ s }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Hình thức dịch</label>
+                        <select formControlName="translationType">
+                            <option value="">Select a graphics</option>
+                            <option *ngFor="let t of translationTypes" [value]="t">{{ t }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Độ tuổi xem phim</label>
+                        <select formControlName="ageRating">
+                            <option value="">Select a age</option>
+                            <option *ngFor="let a of ageRatings" [value]="a">{{ a }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Ngày chiếu</label>
+                        <input type="date" formControlName="showDate">
+                    </div>
+
+                    <div class="form-field">
+                        <label>Năm phát hành</label>
+                        <input type="number" formControlName="releaseYear" placeholder="Enter release year">
+                    </div>
+
+                    <div class="form-field">
+                        <label>Thời lượng phim (phút)</label>
+                        <input type="number" formControlName="duration" placeholder="Enter duration">
+                    </div>
+
+                    <div class="form-field">
+                        <label>Trạng thái</label>
+                        <select formControlName="status">
+                            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Quốc gia</label>
+                        <select formControlName="country">
+                            <option value="">Select a country</option>
+                            <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field poster-field">
+                        <label>Ảnh poster</label>
+                        <div class="poster-upload">
+                            <div class="poster-preview" *ngIf="posterPreview; else noPoster">
+                                <img [src]="posterPreview" alt="Poster phim">
+                            </div>
+
+                            <ng-template #noPoster>
+                                <div class="poster-placeholder">
+                                    Chưa có ảnh poster
+                                </div>
+                            </ng-template>
+
+                            <label class="btn btn-primary btn-sm poster-btn">
+                                Thay đổi ảnh phim
+                                <input type="file" accept="image/*" (change)="onPosterChange($event)" hidden>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

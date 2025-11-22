@@ -1,0 +1,342 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-circle">A</div>
+      <div class="logo-text">
+        <div class="small">ADMIN</div>
+        <div class="title">Bloomatic</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="activeView === 'dashboard'" (click)="activeView = 'dashboard'">
+        <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span>Tổng quan</span>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-group-title">Doanh thu</div>
+        <a class="nav-item">
+          <span class="icon"><i class="fa-solid fa-film"></i></span>
+          <span>Doanh thu theo phim</span>
+        </a>
+        <a class="nav-item">
+          <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+          <span>Doanh thu theo rạp</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">Quản lý phim</div>
+        <a class="nav-item" [class.active]="activeView === 'movieList'" (click)="activeView = 'movieList'">
+          <span class="icon"><i class="fa-solid fa-list"></i></span>
+          <span>Danh sách phim</span>
+        </a>
+        <a class="nav-item" [class.active]="activeView === 'movieCreate'" (click)="activeView = 'movieCreate'">
+          <span class="icon"><i class="fa-solid fa-plus"></i></span>
+          <span>Tạo phim</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">Khác</div>
+        <a class="nav-item">
+          <span class="icon"><i class="fa-solid fa-user"></i></span>
+          <span>Quản lý người dùng</span>
+        </a>
+        <a class="nav-item">
+          <span class="icon"><i class="fa-solid fa-gear"></i></span>
+          <span>Cấu hình hệ thống</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- <main class="main">
+    <header class="main-header">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Doanh thu theo ngày, khách hàng mới, tổng số vé bán ra</p>
+      </div>
+      <div class="user-pill">
+        <span class="avatar">A</span>
+        <span>Admin</span>
+      </div>
+    </header>
+
+    <section class="kpi-row">
+      <div class="kpi-card border-blue">
+        <div class="kpi-title">Doanh thu trong ngày</div>
+        <div class="kpi-value">{{ todayRevenue | number:'1.0-0' }}</div>
+        <div class="kpi-sub">VNĐ</div>
+      </div>
+      <div class="kpi-card border-green">
+        <div class="kpi-title">Khách hàng mới</div>
+        <div class="kpi-value">{{ newCustomers }}</div>
+        <div class="kpi-sub">Tháng hiện tại</div>
+      </div>
+      <div class="kpi-card border-yellow">
+        <div class="kpi-title">Tổng vé bán ra</div>
+        <div class="kpi-value">{{ soldTickets }}</div>
+        <div class="kpi-sub">Tháng hiện tại</div>
+      </div>
+      <div class="kpi-card border-red">
+        <div class="kpi-title">Tổng doanh thu</div>
+        <div class="kpi-value">{{ totalRevenue | number:'1.0-0' }}</div>
+        <div class="kpi-sub">Tháng hiện tại</div>
+      </div>
+    </section>
+
+    <section class="charts-row">
+      <div class="chart-card">
+        <div class="card-header">
+          <h2>Doanh thu theo phim</h2>
+          <span class="muted">Top bài viết được xem nhiều nhất</span>
+        </div>
+        <div class="chart-body">
+          <canvas
+            baseChart
+            [data]="movieBarData"
+            [options]="movieBarOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-header">
+          <h2>Doanh thu theo tháng</h2>
+          <span class="muted">Biểu đồ theo tháng</span>
+        </div>
+        <div class="chart-body">
+          <canvas
+            baseChart
+            [data]="monthLineData"
+            [options]="monthLineOptions"
+            [type]="'line'">
+          </canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="tables-row">
+      <div class="table-card">
+        <div class="card-header">
+          <h2>Doanh thu theo phim</h2>
+          <a href="#" class="link">Xem tất cả</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên phim</th>
+              <th>Tổng vé bán ra</th>
+              <th>Tổng doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monkey Man Báo Thù</td>
+              <td>5</td>
+              <td>760,000</td>
+            </tr>
+            <tr>
+              <td>Cái Giá Của Hạnh Phúc</td>
+              <td>4</td>
+              <td>666,000</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <button class="page active">1</button>
+          <button class="page">2</button>
+          <button class="page">›</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-header">
+          <h2>Doanh thu theo rạp</h2>
+          <a href="#" class="link">Xem tất cả</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Rạp chiếu</th>
+              <th>Tổng vé bán ra</th>
+              <th>Tổng doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>HCinema Aeon Hà Đông</td>
+              <td>9</td>
+              <td>1,826,000</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <button class="page active">1</button>
+        </div>
+      </div>
+    </section>
+  </main> -->
+  <main class="main" [ngSwitch]="activeView">
+    <!-- DASHBOARD -->
+    <ng-container *ngSwitchCase="'dashboard'">
+      <header class="main-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Doanh thu theo ngày, khách hàng mới, tổng số vé bán ra</p>
+        </div>
+        <div class="user-pill">
+          <span class="avatar">A</span>
+          <span>Admin</span>
+        </div>
+      </header>
+
+      <section class="kpi-row">
+        <div class="kpi-card border-blue">
+          <div class="kpi-title">Doanh thu trong ngày</div>
+          <div class="kpi-value">{{ todayRevenue | number:'1.0-0' }}</div>
+          <div class="kpi-sub">VNĐ</div>
+        </div>
+        <div class="kpi-card border-green">
+          <div class="kpi-title">Khách hàng mới</div>
+          <div class="kpi-value">{{ newCustomers }}</div>
+          <div class="kpi-sub">Tháng hiện tại</div>
+        </div>
+        <div class="kpi-card border-yellow">
+          <div class="kpi-title">Tổng vé bán ra</div>
+          <div class="kpi-value">{{ soldTickets }}</div>
+          <div class="kpi-sub">Tháng hiện tại</div>
+        </div>
+        <div class="kpi-card border-red">
+          <div class="kpi-title">Tổng doanh thu</div>
+          <div class="kpi-value">{{ totalRevenue | number:'1.0-0' }}</div>
+          <div class="kpi-sub">Tháng hiện tại</div>
+        </div>
+      </section>
+
+      <section class="charts-row">
+        <div class="chart-card">
+          <div class="card-header">
+            <h2>Doanh thu theo phim</h2>
+            <span class="muted">Top bài viết được xem nhiều nhất</span>
+          </div>
+          <div class="chart-body">
+            <canvas baseChart [data]="movieBarData" [options]="movieBarOptions" [type]="'bar'">
+            </canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="card-header">
+            <h2>Doanh thu theo tháng</h2>
+            <span class="muted">Biểu đồ theo tháng</span>
+          </div>
+          <div class="chart-body">
+            <canvas baseChart [data]="monthLineData" [options]="monthLineOptions" [type]="'line'">
+            </canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="tables-row">
+        <!-- giữ nguyên 2 bảng doanh thu như cũ -->
+        <!-- ... (bạn copy nguyên section tables-row cũ vào đây) -->
+      </section>
+    </ng-container>
+
+    <!-- DANH SÁCH PHIM -->
+    <ng-container *ngSwitchCase="'movieList'">
+      <section class="table-card movie-list-card">
+        <div class="card-header">
+          <h2>Danh sách phim</h2>
+          <div>
+            <button class="btn" (click)="activeView = 'movieCreate'">+ Tạo phim</button>
+            <button class="btn-outline">Refresh</button>
+          </div>
+        </div>
+
+        <table class="movie-table">
+          <thead>
+            <tr>
+              <th>Tên phim</th>
+              <th>Năm phát hành</th>
+              <th>Thể loại</th>
+              <th>Lịch chiếu</th>
+              <th>Trạng thái</th>
+              <th>Ngày tạo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of movies">
+              <td>{{ m.name }}</td>
+              <td>{{ m.releaseYear }}</td>
+              <td>
+                <span class="badge badge-pill" *ngFor="let g of m.genres">{{ g }}</span>
+              </td>
+              <td class="link">{{ m.showDate }}</td>
+              <td>
+                <span class="badge" [ngClass]="m.status === 'Công khai' ? 'badge-success' : 'badge-warning'">
+                  {{ m.status }}
+                </span>
+              </td>
+              <td>{{ m.createdDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </ng-container>
+
+    <!-- TẠO PHIM -->
+    <ng-container *ngSwitchCase="'movieCreate'">
+      <section class="table-card movie-form">
+        <div class="card-header">
+          <div>
+            <button class="btn-outline" (click)="activeView = 'movieList'">Quay lại</button>
+          </div>
+          <button class="btn">Tạo phim</button>
+        </div>
+
+        <div class="movie-form-grid">
+          <div class="form-group">
+            <label>Tên phim</label>
+            <input type="text" placeholder="Nhập tên phim" />
+          </div>
+          <div class="form-group">
+            <label>Tên phim (tiếng Anh)</label>
+            <input type="text" placeholder="Nhập tên tiếng Anh" />
+          </div>
+          <div class="form-group full">
+            <label>Mô tả</label>
+            <textarea rows="3" placeholder="Nhập mô tả"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Thể loại</label>
+            <input type="text" placeholder="Chọn thể loại" />
+          </div>
+          <div class="form-group">
+            <label>Ngày chiếu</label>
+            <input type="date" />
+          </div>
+          <div class="form-group">
+            <label>Năm phát hành</label>
+            <input type="number" />
+          </div>
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select>
+              <option>Công khai</option>
+              <option>Nháp</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quốc gia</label>
+            <input type="text" placeholder="Nhập quốc gia" />
+          </div>
+        </div>
+      </section>
+    </ng-container>
+  </main>
+</div>

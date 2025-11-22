@@ -1,0 +1,84 @@
+<div class="movie-page">
+    <!-- Top bar: breadcrumb + nút -->
+    <div class="top-bar">
+        <div class="breadcrumb">
+            <span>Dashboard</span>
+            <span class="slash">/</span>
+            <span class="current">Danh sách phim</span>
+        </div>
+
+        <div class="top-actions">
+            <button class="btn btn-primary" routerLink="/admin/movies/create">
+                + Tạo phim
+            </button>
+            <button class="btn btn-outline" (click)="onRefresh()">
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Card trắng chứa table -->
+    <div class="movie-card">
+        <table class="movie-table">
+            <thead>
+                <tr>
+                    <th>Tên phim</th>
+                    <th>Năm phát hành</th>
+                    <th>Thể loại</th>
+                    <th>Lịch chiếu</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let m of movies | paginate: { itemsPerPage: pageSize, currentPage: page }">
+                    <td class="movie-name">
+                        {{ m.name }}
+                    </td>
+                    <td>{{ m.releaseYear }}</td>
+                    <td>
+                        <span class="badge badge-genre" *ngFor="let g of m.genres">
+                            {{ g }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-date">
+                            {{ m.showDate }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge"
+                            [ngClass]="m.status === 'Công khai' ? 'badge-status-open' : 'badge-status-hidden'">
+                            {{ m.status }}
+                        </span>
+                    </td>
+                    <td>{{ m.createdDate }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- <pagination-controls
+            class="pagination"
+            (pageChange)="page = $event">
+        </pagination-controls> -->
+
+        <!-- Footer: pagination -->
+        <div class="table-footer">
+            <div class="pagination">
+                <button class="page-btn" (click)="prevPage()" [disabled]="page === 1">
+                    &laquo;
+                </button>
+                <button class="page-btn" *ngFor="let p of pages" (click)="goToPage(p)" [class.active]="page === p">
+                    {{ p }}
+                </button>
+                <button class="page-btn" (click)="nextPage()" [disabled]="page === pages.length">
+                    &raquo;
+                </button>
+            </div>
+            <div class="page-size">
+                <span>{{ pageSize }} / page</span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,711 @@
+:host {
+    display: block;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+.crumbs {
+    max-width: 1200px;
+    margin: 18px auto 6px;
+    padding: 0 16px;
+    color: #cfcfcf;
+    font-size: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.crumbs a {
+    color: #cfcfcf;
+    text-decoration: none
+}
+
+.crumbs .current {
+    color: #fff;
+    font-weight: 700
+}
+
+.detail-wrap {
+  width: 100%;
+  max-width: 1200px;              /* cố định khung, không nhảy khi đổi phim */
+  margin: 8px auto 32px;
+  padding: 20px clamp(16px, 4vw, 48px);
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 36px;
+  background: #000;
+  align-items: flex-start;         /* poster + detail bám trên */
+  /* bỏ height cố định để nội dung cao tới đâu tự giãn tới đó */
+}
+
+
+
+.poster {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
+    background: #000;
+}
+
+.poster img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 3/4;
+}
+
+.poster .play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.poster .triangle {
+    width: 0;
+    height: 0;
+    border-left: 20px solid #111;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    margin-left: 4px;
+}
+
+.right {
+    padding: 6px 2px;
+}
+
+.meta-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.badge-age {
+    background: #f7d04d;
+    color: #111;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-weight: 800;
+}
+
+.title-wrap {
+    flex: 1;
+}
+
+.movie-title {
+    margin: 0;
+    font-size: 34px;
+    letter-spacing: 0.6px;
+}
+
+.sub {
+    margin-top: 6px;
+    color: #cfcfcf;
+}
+
+.lead {
+    display: block;
+    margin: 12px 0 18px;
+    color: #d0cbd0;
+    font-style: italic;
+}
+
+.section {
+    margin-top: 10px;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.desc {
+    color: #ddd;
+    line-height: 1.6;
+    padding-right: 250px;
+}
+
+/* collapsed description: clamp to ~4 lines on most screens */
+.desc.collapsed {
+    display: -webkit-box;
+    /* prefer the standard property for compatibility, fall back to -webkit */
+    line-clamp: 4;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.read-more {
+    margin-top: 8px;
+    background: transparent;
+    border: none;
+    color: #ffd54a;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+/* ensure spacing on very small screens */
+@media (max-width: 420px) {
+    .detail-wrap {
+        padding-left: 12px;
+        padding-right: 12px;
+        gap: 18px
+    }
+}
+
+.info-row {
+    display: flex;
+    gap: 36px;
+    margin-top: 18px;
+}
+
+.info-val {
+    color: #fff;
+    margin-top: 6px;
+}
+
+.actions {
+    margin-top: 22px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer
+}
+
+.btn.primary {
+    background: #e61e66;
+    color: #fff;
+    border: none
+}
+
+.btn.ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.12)
+}
+
+@media (max-width: 860px) {
+    .detail-wrap {
+        grid-template-columns: 1fr;
+        padding: 14px;
+    }
+
+    .poster {
+        height: 420px;
+    }
+
+    .movie-title {
+        font-size: 24px;
+    }
+}
+
+/* ===== Showtimes grid ===== */
+.showtimes-grid {
+    max-width: 1200px;
+    margin: 18px auto 80px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+    padding: 0 clamp(16px, 4vw, 48px);
+}
+
+.schedule-col {
+    background: #fff;
+    color: #111;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(9, 10, 14, 0.06);
+    padding: 16px;
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.schedule-header h3 {
+    margin: 0;
+    font-size: 18px
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+    align-items: center
+}
+
+.loc-select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e6e6e6
+}
+
+// .date-tabs {
+//     display: flex;
+//     gap: 10px;
+//     margin: 14px 0 12px;
+//     overflow: auto;
+//     align-items: center;
+// }
+
+/* movie-detail specific: stacked day (big) above weekday (small) */
+.date-tabs button {
+    border: 1px solid #eee;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+}
+
+.date-tabs button .day {
+    font-weight: 900;
+    font-size: 20px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.date-tabs button small { font-size: 20px; color: #9ca3af; }
+
+.date-tabs button:hover { transform: translateY(-6px); box-shadow: 0 10px 24px rgba(2,6,23,0.08); }
+
+.date-tabs button.active { background: #e61e66; border-color: #ff9fcf; color: #fff; }
+.date-tabs button.active small { color: rgba(255,255,255,0.9); }
+
+/* thanh chứa vé ngày */
+.date-tabs {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  margin: 12px 0;
+  overflow-x: auto;
+  align-items: center;
+}
+
+/* ẩn scrollbar ngang (optional) */
+.date-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* vé ngày */
+.date-ticket {
+  position: relative;
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  width: 85px;
+  height: 102px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+
+  border-radius: 18px;
+  background: #eef2ff;              /* màu xám nhạt như hình */
+  color: #111827;
+  font-family: inherit;
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    opacity 0.12s ease;
+}
+
+/* lỗ tròn trên cùng */
+.date-ticket .ticket-hole {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  box-shadow: 0 0 0 3px #f9fafb;
+}
+
+/* khuyết 2 bên vé (nền phía sau nên là trắng hoặc rất nhạt) */
+.date-ticket::before,
+.date-ticket::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff; /* màu nền container */
+}
+
+.date-ticket::before {
+  left: -7px;
+}
+
+.date-ticket::after {
+  right: -7px;
+}
+
+/* số ngày to */
+.date-ticket .ticket-day {
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+/* thứ nhỏ */
+.date-ticket .ticket-weekday {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+/* trạng thái bình thường & active */
+.date-ticket {
+  opacity: 0.8;
+}
+
+.date-ticket.active {
+  opacity: 1;
+  background: #e61e66; border-color: #ff9fcf; color: #fff;
+  transform: translateY(-4px);
+  /* box-shadow: 0 14px 30px rgba(245, 158, 11, 0.6); */
+}
+
+.date-ticket.active .ticket-weekday {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.cinema-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Card mỗi rạp */
+.cinema-card {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+  padding: 10px 12px;
+}
+
+/* Header: logo + tên rạp + mũi tên */
+.cinema-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cinema-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cinema-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.cinema-meta {
+  max-width: 520px;
+}
+
+.cinema-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.cinema-addr {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.cinema-addr a {
+  margin-left: 4px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cinema-addr a:hover {
+  text-decoration: underline;
+}
+
+.cinema-toggle {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.cinema-toggle i {
+  transition: transform 0.16s ease;
+}
+
+.cinema-card.expanded .cinema-toggle i.fa-chevron-down {
+  transform: rotate(0deg);
+}
+
+/* Body: định dạng & giờ chiếu */
+/* body mặc định: thu gọn */
+.cinema-body {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    margin-top 0.22s ease;
+}
+
+/* khi expanded = true thì mở ra */
+.cinema-body.expanded {
+  max-height: 500px;  // đủ chứa nhiều khung giờ, cần thì tăng
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 8px;
+  pointer-events: auto;
+}
+
+/* mũi tên xoay mượt hơn */
+.cinema-toggle i {
+  transition: transform 0.22s ease;
+}
+
+/* nếu bạn đang dùng class .expanded trên cinema-card:
+   <div class="cinema-card" [class.expanded]="c.isExpanded">
+   thì có thể xoay icon như này: */
+.cinema-card.expanded .cinema-toggle i {
+  transform: rotate(180deg);
+}
+
+
+.format-row {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+/* dãy giờ chiếu giống các ô xanh trong hình */
+.showtimes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.time {
+  min-width: 96px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #0ea5e9;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, transform 0.1s ease;
+}
+
+.time:hover {
+  background: #0ea5e9;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+
+.sidebar-col {
+  padding: 8px 6px;
+}
+
+.sidebar-col h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.now-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* mỗi phim */
+.now-item {
+  display: flex;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.now-item.active {
+  background: #f9fafb;
+}
+
+.now-item:last-child {
+  border-bottom: none;
+}
+
+/* poster nhỏ bên trái */
+.now-thumb {
+  position: relative;
+  width: 56px;
+  min-width: 56px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.15);
+}
+
+.now-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* badge độ tuổi trên poster */
+.now-age {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.now-age-yellow { background: #facc15; }
+.now-age-orange { background: #fb923c; color: #fff; }
+.now-age-green  { background: #22c55e; color: #fff; }
+.now-age-blue   { background: #38bdf8; color: #fff; }
+
+/* phần thông tin bên phải */
+.now-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.now-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.now-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.3;
+}
+
+/* badge Sneakshow */
+.now-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: #0ea5e9;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+/* dòng thể loại */
+.now-genre {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+/* dòng rating sao */
+.now-rating {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.now-rating i {
+  font-size: 12px;
+}
+
+/* mobile: sidebar xuống dưới */
+@media (max-width: 980px) {
+  .showtimes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-col {
+    order: 2;
+    margin-top: 12px;
+  }
+}
+
+
+@media (max-width: 980px) {
+    .showtimes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-col {
+        order: 2
+    }
+}
+
+@media (max-width: 900px) {
+  .detail-wrap {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+  }
+}
+
+.no-showtimes {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 13px;
+}

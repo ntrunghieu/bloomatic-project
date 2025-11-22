@@ -1,0 +1,140 @@
+<main class="success-page">
+  <section class="success-wrap">
+    <!-- Header nhỏ của block -->
+    <div hidden ="top-caption">
+      <div class="brand-row">
+        <div class="brand-logo">HC</div>
+        <div class="brand-name">HCinema</div>
+      </div>
+      <h1 class="page-title">Xác nhận sau khi đặt vé thành công</h1>
+    </div>
+
+    <!-- Card chính -->
+    <div class="success-card">
+      <!-- Hàng trạng thái -->
+      <div class="success-status">
+        <div class="status-icon">
+          <span class="check">✓</span>
+        </div>
+        <div class="status-text">
+          <h2>Đặt vé thành công!</h2>
+          <p>
+            Cảm ơn bạn đã thanh toán thành công đơn hàng
+            <strong>{{ booking.bookingCode }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Hai cột -->
+      <div class="success-body">
+        <!-- Trái: thông tin vé -->
+        <div class="ticket-panel">
+          <!-- header phim -->
+          <div class="ticket-movie">
+            <span class="age-badge">{{ booking.ageRating }}</span>
+            <span class="movie-title">{{ booking.movieTitle }}</span>
+          </div>
+
+          <div class="ticket-block">
+            <div class="row">
+              <div class="label">Thời gian</div>
+              <div class="value">{{ booking.timeRange }}</div>
+              <div class="label">Ngày chiếu</div>
+              <div class="value">{{ booking.dateLabel }}</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Rạp</div>
+              <div class="value">
+                <div class="value-strong">{{ booking.cinemaName }}</div>
+                <div class="value-sub">{{ booking.cinemaAddress }}</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">Phòng chiếu</div>
+              <div class="value">{{ booking.roomName }}</div>
+              <div class="label">Định dạng</div>
+              <div class="value">{{ booking.formatName }}</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Ghế</div>
+              <div class="value seat-list">
+                <span *ngFor="let s of booking.seats; let last = last">
+                  {{ s }}<span *ngIf="!last">, </span>
+                </span>
+              </div>
+              <div class="label">Tạm tính</div>
+              <div class="value">
+                {{ formatCurrency(booking.subTotal) }}
+              </div>
+            </div>
+
+            <!-- combos -->
+            <div class="row" *ngFor="let c of booking.combos">
+              <div class="label">Đồ ăn - nước</div>
+              <div class="value">
+                {{ c.name }}
+              </div>
+              <div class="label"></div>
+              <div class="value text-right">
+                {{ formatCurrency(c.price) }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">Giảm giá</div>
+              <div class="value">
+                {{ formatCurrency(booking.discount) }}
+              </div>
+            </div>
+
+            <div class="row total-row">
+              <div class="label">Thành tiền</div>
+              <div class="value total">
+                {{ formatCurrency(booking.total) }}
+              </div>
+            </div>
+
+            <div class="small-note">
+              Mã QR (nếu có) sẽ được áp dụng ở bước nhận vé tại rạp.
+            </div>
+          </div>
+        </div>
+
+        <!-- Phải: QR panel -->
+        <div class="qr-panel">
+          <div class="qr-header">
+            Mã QR được sử dụng khi quét vé tại rạp
+          </div>
+
+          <div class="qr-box">
+            <!-- Nếu sau này có ảnh QR thực -->
+            <img
+              *ngIf="booking.qrCodeUrl; else qrPlaceholder"
+              [src]="booking.qrCodeUrl"
+              alt="QR Code"
+            />
+            <ng-template #qrPlaceholder>
+              <div class="qr-placeholder-inner">
+                QR CODE
+              </div>
+            </ng-template>
+          </div>
+
+          <button class="download-btn" type="button">
+            Tải xuống QRCode
+          </button>
+        </div>
+      </div>
+
+      <!-- nút quay về -->
+      <div class="bottom-actions">
+        <button class="back-home" type="button" (click)="goHome()">
+          Quay về trang chủ
+        </button>
+      </div>
+    </div>
+  </section>
+</main>

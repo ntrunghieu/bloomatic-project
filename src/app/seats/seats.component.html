@@ -1,0 +1,89 @@
+<!-- <app-header></app-header> -->
+
+<main class="seat-page">
+  <div class="container">
+    <h1 class="page-title">Chọn ghế</h1>
+
+    <div class="seat-area">
+      <aside class="movie-info">
+        <img src="/assets/posters/sample-poster.jpg" alt="poster"/>
+        <h3>Quái Thú Vô Hình</h3>
+        <p>11:40 - Hôm nay 11/11 - Cinema 1</p>
+      </aside>
+
+      <section class="seat-map-container">
+        <div class="screen">MÀN HÌNH</div>
+
+        <table class="seat-map">
+          <tbody>
+            <tr *ngFor="let r of rows">
+              <th>{{ r }}</th>
+              <!-- normal rows A-C and VIP rows D-F -->
+              <ng-container *ngIf="r !== 'G'">
+                <td *ngFor="let c of cols"
+                    [class.booked]="bookedSeats.includes(r + c)"
+                    [class.selected]="selectedSeats.includes(r + c)"
+                    [class.available]="!bookedSeats.includes(r + c) && !selectedSeats.includes(r + c)"
+                    [ngClass]="{ 'vip': r==='D'||r==='E'||r==='F', 'normal': r==='A'||r==='B'||r==='C' }"
+                    (click)="toggleSeat(r + c)">
+                  {{ r + c }}
+                </td>
+              </ng-container>
+
+              <!-- couple row G: render 6 couple seats, each colspan=2 -->
+              <ng-container *ngIf="r === 'G'">
+                <td *ngFor="let i of coupleCols; let idx = index"
+                    colspan="2"
+                    [class.booked]="bookedSeats.includes(r + (idx+1))"
+                    [class.selected]="selectedSeats.includes(r + (idx+1))"
+                    [class.couple]="true"
+                    (click)="toggleSeat(r + (idx+1))">
+                  {{ r + (idx+1) }}
+                </td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="seat-legend">
+          <span class="legend-item"><span class="seat-sample available"></span> Thường</span>
+          <span class="legend-item"><span class="seat-sample selected"></span> Đang chọn</span>
+          <span class="legend-item"><span class="seat-sample booked"></span> Đã đặt</span>
+          <span class="legend-item"><span class="seat-sample couple"></span> Ghế couple</span>
+        </div>
+      </section>
+
+      <aside class="booking-info">
+  <h4>{{ selectedSeatCount() }} chỗ</h4>
+        <p>Ghế: <strong>{{ selectedSeats.join(', ') || 'Chưa chọn' }}</strong></p>
+        <div class="price-breakdown">
+          <ng-container *ngIf="selectedSeats.length>0; else none">
+            <div *ngIf="getTotals().normal>0">Thường: {{ getTotals().normal }} × {{ PRICE_NORMAL | number }} = <strong>{{ getTotals().normalTotal | number }}đ</strong></div>
+            <div *ngIf="getTotals().vip>0">VIP: {{ getTotals().vip }} × {{ PRICE_VIP | number }} = <strong>{{ getTotals().vipTotal | number }}đ</strong></div>
+            <div *ngIf="getTotals().couple>0">Couple: {{ getTotals().couple }} × {{ PRICE_COUPLE | number }} = <strong>{{ getTotals().coupleTotal | number }}đ</strong></div>
+            <div class="total">Tổng tiền: <strong class="price">{{ getTotals().total | number }}đ</strong></div>
+          </ng-container>
+          <ng-template #none>
+            <div>Tổng tiền: <strong class="price">0đ</strong></div>
+          </ng-template>
+        </div>
+        <button class="btn primary" [disabled]="selectedSeats.length === 0">Tiếp tục</button>
+      </aside>
+    </div>
+
+    <div class="booking-panel">
+      <div class="bp-left">
+        <img src="/assets/logos/cgv.png" alt="logo" />
+        <div>
+          <div class="bp-title">Quái Thú Vô Hình - CGV Vĩnh Trung Plaza</div>
+          <div class="bp-sub">11:40 - Hôm nay 11/11 - Cinema 1</div>
+        </div>
+      </div>
+      <div class="bp-center">Chỗ ngồi: <strong>{{ selectedSeats.join(', ') || 'Chưa chọn' }}</strong></div>
+      <div class="bp-right">
+        <div class="price">{{ getTotals().total | number }}đ</div>
+        <button class="btn primary" [disabled]="selectedSeats.length === 0">Tiếp tục</button>
+      </div>
+    </div>
+  </div>
+</main>

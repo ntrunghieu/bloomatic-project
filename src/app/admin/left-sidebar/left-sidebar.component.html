@@ -1,0 +1,114 @@
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-circle">A</div>
+            <div class="logo-text">
+                <div class="small">ADMIN</div>
+                <div class="title">Bloomatic</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Item đơn -->
+            <!-- <a class="nav-item" [class.active]="activeView === 'dashboard'" (click)="activeView = 'dashboard'">
+                <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+                <span>Dashboard</span>
+            </a> -->
+
+            <!-- Nhóm: Doanh thu -->
+            <div class="nav-group" [class.open]="openGroup === 'revenue'">
+                <button class="nav-group-header" (click)="toggleGroup('revenue')">
+                    <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+                    <!-- <span class="icon"><i class="fa-solid fa-coins"></i></span> -->
+                    <span class="text">Dashboard</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'overall'"
+                        (click)="activeView = 'overall'">
+                        <span>Tổng quan</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Nhóm: Quản lý phim -->
+            <div class="nav-group" [class.open]="openGroup === 'movies'">
+                <button class="nav-group-header" (click)="toggleGroup('movies')">
+                    <span class="icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    <span class="text">Quản lý phim</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a routerLink="/admin/movies/list" routerLinkActive="active"class="nav-sub-item" [class.active]="activeView === 'movieList'"
+                        (click)="activeView = 'movieList'">
+                        <span>Danh sách phim</span>
+                    </a>
+                    <a routerLink="/admin/movies/create" routerLinkActive="active"class="nav-sub-item" [class.active]="activeView === 'movieCreate'"
+                        (click)="activeView = 'movieCreate'">
+                        <span>Tạo phim</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Nhóm: Quản lý lịch chiếu -->
+            <div class="nav-group" [class.open]="openGroupSchedule === 'schedule'">
+                <button class="nav-group-header" (click)="toggleGroupSchedule('schedule')">
+                    <span class="icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    <span class="text">Quản lý lịch chiếu</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a class="nav-sub-item" [class.active]="activeView === 'scheduleList'"
+                        (click)="activeView = 'scheduleList'">
+                        <span>Danh sách lịch chiếu</span>
+                    </a>
+                    <a class="nav-sub-item" [class.active]="activeView === 'scheduleCreate'"
+                        (click)="activeView = 'scheduleCreate'">
+                        <span>Tạo lịch chiếu</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Nhóm: Quản lý rạp chiếu -->
+            <div class="nav-group" [class.open]="openGroupSchedule === 'theater'">
+                <button class="nav-group-header" (click)="toggleGroupSchedule('theater')">
+                    <span class="icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    <span class="text">Quản lý rạp chiếu</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">               
+                    <a class="nav-sub-item" [class.active]="activeView === 'theaterList'"
+                        (click)="activeView = 'theaterList'">
+                        <span>Danh sách rạp chiếu</span>
+                    </a>
+                    <a class="nav-sub-item" [class.active]="activeView === 'theaterCreate'"
+                        (click)="activeView = 'theaterCreate'">
+                        <span>Tạo rạp chiếu</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Nhóm: Khác -->
+            <div class="nav-group" [class.open]="openGroup === 'others'">
+                <button class="nav-group-header" (click)="toggleGroup('others')">
+                    <span class="icon"><i class="fa-solid fa-ellipsis"></i></span>
+                    <span class="text">Khác</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a class="nav-sub-item">
+                        <span>Quản lý người dùng</span>
+                    </a>
+                    <a class="nav-sub-item">
+                        <span>Cấu hình hệ thống</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </aside>
+</div>

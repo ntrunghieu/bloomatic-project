@@ -1,0 +1,181 @@
+<!-- <app-header></app-header> -->
+<app-cinema-hero></app-cinema-hero>
+<section class="now-showing">
+  <div class="container">
+    <h4 class="title" style="padding-top: 20px; padding-bottom:10px; margin-top: 100px;">PHIM ĐANG CHIẾU</h4>
+
+  <button *ngIf="movies.length > 5" class="nav left" (click)="prev()" aria-label="Trước"><i class="fa-solid fa-angle-left"></i></button>
+  <button *ngIf="movies.length > 5" class="nav right" (click)="next()" aria-label="Sau"><i class="fa-solid fa-angle-right"></i></button>
+
+    <div #viewport class="viewport" (mouseenter)="stop()" (mouseleave)="start()">
+      <div class="track">
+        <article class="card" *ngFor="let m of movies">
+          <div class="poster">
+            <img [src]="m.poster" [alt]="m.title" loading="lazy" />
+            <span class="badge-age">{{ m.age }}</span>
+            <button class="play" (click)="openTrailer(m)" aria-label="Xem trailer">
+              <span class="triangle"></span>
+            </button>
+            <span class="dayno">{{ m.dayNo }}</span>
+          </div>
+          <div class="meta">
+            <h3 class="name" [title]="m.title">{{ m.title }}</h3>
+            <p class="genres">{{ m.genres.join(', ') }}</p>
+            <p hidden ="rating"><span class="star">★</span>{{ m.rating.toFixed(1) }}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Trailer Modal ===== -->
+  <div class="overlay" *ngIf="modalOpen" (click)="closeTrailer()"></div>
+
+  <div class="modal" *ngIf="modalOpen" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <button class="close" (click)="closeTrailer()" aria-label="Đóng">✕</button>
+
+    <!-- Video banner -->
+    <div class="video-wrap">
+      <iframe
+        *ngIf="safeSrc"
+        class="player"
+        [src]="safeSrc"
+        title="Trailer"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen></iframe>
+
+      <!-- Thanh “Video khác” -->
+      <div class="more">
+        <div class="label">Video khác</div>
+        <div class="thumbs">
+          <button
+            class="thumb"
+            *ngFor="let t of active?.moreTrailers"
+            (click)="setVideo(t.id)"
+            [title]="t.title || 'Trailer'">
+            <img [src]="t.thumb" alt="thumb" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thanh điều khiển phụ (minh hoạ giống ảnh) -->
+    <!-- <div class="controls">
+      <div class="progress"><span class="dot"></span></div>
+      <div class="ctrl-right">
+        <button title="Thông báo">🔔</button>
+        <button title="Cài đặt">⚙️</button>
+        <a class="yt" target="_blank" rel="noopener" *ngIf="active"
+           [href]="'https://www.youtube.com/watch?v=' + active.trailerId">YouTube</a>
+        <button title="Toàn màn hình" onclick="this.closest('.modal')?.querySelector('.player')?.requestFullscreen?.()">⛶</button>
+      </div>
+    </div> -->
+
+    <!-- Thông tin phim -->
+    <div class="info">
+      <img class="poster-mini" [src]="active?.poster" alt="" />
+      <div class="text">
+        <h3 class="title" *ngIf="active as mv">
+          {{ mv.title }} <small> - {{ mv.genres.join(', ') }}</small>
+        </h3>
+
+        <p class="desc">{{ active?.description }}</p>
+
+        <div class="actions">
+          <button class="primary">Đặt vé</button>
+          <button class="ghost" (click)="closeTrailer()">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<h4 class="title1"> PHIM SẮP CHIẾU</h4>
+
+<section class="now-showing" style="background-image: none; background-color: white; min-height: 10px;">
+  <div class="container">
+    <!-- <h4 class="title" style="padding-top: 20px; padding-bottom:10px; margin-top: 100px;">PHIM ĐANG CHIẾU</h4> -->
+
+  <button *ngIf="movies.length > 5" class="nav left" (click)="prev()" aria-label="Trước"><i class="fa-solid fa-angle-left"></i></button>
+  <button *ngIf="movies.length > 5" class="nav right" (click)="next()" aria-label="Sau"><i class="fa-solid fa-angle-right"></i></button>
+
+    <div #viewport class="viewport" (mouseenter)="stop()" (mouseleave)="start()">
+      <div class="track">
+        <article class="card" *ngFor="let m of movies">
+          <div class="poster">
+            <img [src]="m.poster" [alt]="m.title" loading="lazy" />
+            <span class="badge-age">{{ m.age }}</span>
+            <button class="play" (click)="openTrailerSC(m)" aria-label="Xem trailer">
+              <span class="triangle"></span>
+            </button>
+            <span class="dayno">{{ m.dayNo }}</span>
+          </div>
+          <div class="meta">
+            <h3 class="name" style="color: black;" [title]="m.title">{{ m.title }}</h3>
+            <p class="genres" style="color: #111827;">{{ m.genres.join(', ') }}</p>
+            <p hidden class="rating" style="color: black;"><span class="star">★</span>{{ m.rating.toFixed(1) }}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Trailer Modal Sap chieu ===== -->
+  <div class="overlay" *ngIf="modalOpenSapChieu" (click)="closeTrailerSC()"></div>
+
+  <div class="modal" *ngIf="modalOpenSapChieu" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <button class="close" (click)="closeTrailerSC()" aria-label="Đóng">✕</button>
+
+    <!-- Video banner -->
+    <div class="video-wrap">
+      <iframe
+        *ngIf="safeSrc"
+        class="player"
+        [src]="safeSrc"
+        title="Trailer"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen></iframe>
+
+      <!-- Thanh “Video khác” -->
+      <div class="more">
+        <div class="label">Video khác</div>
+        <div class="thumbs">
+          <button
+            class="thumb"
+            *ngFor="let t of active?.moreTrailers"
+            (click)="setVideo(t.id)"
+            [title]="t.title || 'Trailer'">
+            <img [src]="t.thumb" alt="thumb" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thông tin phim -->
+    <div class="info">
+      <img class="poster-mini" [src]="active?.poster" alt="" />
+      <div class="text">
+        <h3 class="title" *ngIf="active as mv">
+          {{ mv.title }} <small> - {{ mv.genres.join(', ') }}</small>
+        </h3>
+
+        <p class="desc">{{ active?.description }}</p>
+
+        <div class="actions">
+          <!-- <button class="primary">Đặt vé</button> -->
+          <button class="ghost" (click)="closeTrailerSC()">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<app-tagline></app-tagline>
+
+<!-- <app-schedule></app-schedule> -->
+<app-movie-list></app-movie-list>
+
+<!-- <app-footer></app-footer> -->

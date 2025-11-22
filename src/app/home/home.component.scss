@@ -1,0 +1,524 @@
+:host {
+  display: block;
+}
+
+.now-showing {
+
+  width: 100vw;
+  margin-left: calc(49% - 50vw);
+  margin-right: calc(49% - 50vw);
+
+  --bg: #07070a;
+  --fg: #f5f7fb;
+  --muted: #b8bdc9;
+  --accent: #ffd54a;
+
+  /* nền đen + gradient */
+  --bg-url: url('../../assets/cinema.png');
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, .6), rgba(0, 0, 0, .9)),
+    var(--bg-url);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  /* 🔹 thấy trọn ảnh, KHÔNG cắt */
+  background-color: #000;
+  /* viền 2 bên sẽ là đen */
+
+  /* đặt chiều cao hợp lý để ảnh không bị “kéo giãn” */
+  min-height: clamp(320px, 48vw, 560px);
+
+  color: var(--fg);
+
+  //   background: radial-gradient(ellipse at center, #0d0d14 0%, #07070a 70%), #000;
+  //   color: var(--fg);
+  //   padding: 24px 0 48px;
+
+  /* ==== cấu hình card/viewport ==== */
+  --card-w: 200px; /* base card width */
+  --gap: 18px;     /* gap between cards */
+  /* number of visible cards in viewport (default: 5) */
+  --visible: 5;
+  /* nav offset from viewport edge */
+  --nav-offset: 36px;
+  /* side padding (nav offset + inner cushion) — used to keep cards from touching edges */
+  --sidepad: calc(var(--nav-offset) + 28px);
+  /* viewport width computed from visible count */
+  --vpw: calc(var(--card-w) * var(--visible) + var(--gap) * (var(--visible) - 1));
+
+  /* ===== Overlay + Modal ===== */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+  }
+
+  .modal {
+    position: fixed;
+    inset: 40px 24px;
+    max-width: 860px;
+    margin: auto;
+    z-index: 1000;
+    background: #1a141a;
+    color: #f5f5f7;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    /* giới hạn chiều cao cửa sổ */
+    max-height: 90svh;
+    /* dùng svh để ổn định trên mobile */
+    width: min(860px, 96vw);
+    overflow: hidden;
+    /* ẩn tràn ở container, phần body tự cuộn */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+    cursor: pointer;
+    z-index: 5;
+  }
+
+  /* Video area */
+  .video-wrap {
+    // background: #0a0a0e; position: relative; 
+
+    position: relative;
+    /* giữ tỉ lệ 16:9 nhưng KHỐNG CHẾ chiều cao */
+    aspect-ratio: 16/9;
+    max-height: 52svh;
+    /* ~ nửa màn hình */
+    flex: 0 0 auto;
+
+  }
+
+  .player {
+
+    // width: 100%; aspect-ratio: 16/9; display: block; 
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* “Video khác” strip */
+  .more {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 14px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, .65) 30%, rgba(0, 0, 0, .8) 100%);
+  }
+
+  .more .label {
+    color: #ddd;
+    font-weight: 700;
+    margin: 0 0 8px 6px;
+  }
+
+  .thumbs {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 12px;
+    overflow: auto hidden;
+    padding-bottom: 4px;
+  }
+
+  .thumb {
+    border: none;
+    background: #18171c;
+    border-radius: 12px;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .thumb img {
+    width: 180px;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+  }
+
+  /* Controls row */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    flex: 0 0 auto;
+  }
+
+  .progress {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, .1);
+    border-radius: 999px;
+    position: relative;
+  }
+
+  .progress .dot {
+    position: absolute;
+    left: 10%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ff0055;
+  }
+
+  .ctrl-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ctrl-right button,
+  .ctrl-right .yt {
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Info */
+  .info {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 14px;
+    padding: 14px;
+    flex: 1 1 auto;
+    overflow: auto;
+  }
+
+  .poster-mini {
+    width: 96px;
+    height: 128px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
+  }
+
+  .info .title {
+    margin: 0 0 6px;
+    font-size: 20px;
+  }
+
+  .info .title small {
+    font-size: 13px;
+    color: #c9c9cf;
+    font-weight: 600;
+  }
+
+  .desc {
+    color: #ddd;
+    line-height: 1.55;
+    margin: 6px 0 12px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .primary {
+    background: #e61e66;
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, .25);
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  // phần cũ
+
+  .container {
+    position: relative;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 16px;
+
+
+  }
+
+  .title {
+    font-size: clamp(22px, 2.5vw, 36px);
+    font-weight: 800;
+    letter-spacing: .5px;
+    margin: 8px 35% 18px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+  }
+
+  .viewport {
+    position: relative;
+    /* để nav bám theo */
+    max-width: var(--vpw);
+    /* chỉ rộng vừa 4 card */
+    margin: 0 auto;
+    /* căn giữa */
+    padding-inline: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+
+    /* Ẩn scrollbar trên nhiều trình duyệt */
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none; /* Firefox */
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--card-w);
+    /* mỗi cột = 1 card */
+    gap: var(--gap);
+    justify-content: flex-start;
+    /* align to start so first/last snap fully into view */
+  }
+
+  .card {
+    scroll-snap-align: start;
+    background: transparent;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+
+      .play {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
+  .poster {
+    position: relative;
+    aspect-ratio: 3 / 4.4;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .badge-age {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #ff6b6b;
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
+    }
+
+    .play {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .85);
+      display: grid;
+      place-items: center;
+      border: none;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(.9);
+      transition: opacity .2s ease, transform .2s ease;
+
+      .triangle {
+        width: 0;
+        height: 0;
+        border-left: 14px solid #111;
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+        margin-left: 3px;
+      }
+    }
+
+    .dayno {
+      position: absolute;
+      bottom: 6px;
+      left: 10px;
+      font-weight: 900;
+      font-size: 42px;
+      line-height: 1;
+      color: rgba(255, 255, 255, .92);
+      text-shadow: 0 4px 18px rgba(0, 0, 0, .6);
+    }
+  }
+
+  .meta {
+    padding: 10px 4px 2px;
+
+    .name {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 4px 0 2px;
+    }
+
+    .genres {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rating {
+      font-weight: 700;
+      font-size: 14px;
+
+      .star {
+        color: var(--accent);
+        margin-right: 4px;
+      }
+    }
+  }
+
+  /* Carousel navigation (position relative to .container so it's not clipped) */
+  .container {
+    position: relative;
+  }
+
+  .container .nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .95);
+    color: #111;
+    border: 0;
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    line-height: 0;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: background .18s ease, transform .18s ease;
+   /* keep below the sticky header (header z-index = 50) so when the page scrolls the
+     header appears above the nav buttons instead of the buttons overlapping it */
+   z-index: 40;
+    /* above cards */
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .45);
+  }
+
+  .container .nav:hover {
+    transform: translateY(-50%) scale(1.04);
+  }
+
+  /* place just outside the viewport so buttons don't cover cards */
+  .container .nav.left {
+    left: calc(50% - var(--vpw)/2 - var(--nav-offset));
+  }
+
+  .container .nav.right {
+    right: calc(50% - var(--vpw)/2 - var(--nav-offset));
+  }
+
+  /* give the viewport horizontal padding so first/last cards are fully visible */
+  .viewport {
+    /* ensure viewport never exceeds available width (keeps no horizontal scrollbar) */
+    --sidepad: var(--sidepad);
+    width: min(var(--vpw), calc(100% - (var(--sidepad) * 2)));
+    padding-inline: var(--sidepad);
+    scroll-padding-inline: var(--sidepad);
+    box-sizing: border-box; /* include padding in width calculation */
+  }
+
+  /* Responsive: số card/khung nhìn phụ thuộc width .viewport (grid-auto-columns) */
+  //   @media (min-width: 480px) { .track { grid-auto-columns: calc(50% - 10px); } }
+  //   @media (min-width: 768px) { .track { grid-auto-columns: calc(33.333% - 13.5px); } }
+  //   @media (min-width: 1024px){ .track { grid-auto-columns: calc(20% - 16px); } }
+  //   @media (max-width: 640px) {
+  //   .modal { inset: 12px; }
+  //   .thumb img { width: 140px; height: 86px; }
+  //   .info { grid-template-columns: 72px 1fr; }
+  //   .poster-mini { width: 72px; height: 100px; }
+  // }
+
+  @media (max-width: 1200px) {
+    /* medium screens: keep 5 visible but slightly smaller */
+    .now-showing { --card-w: 180px; --visible: 5; --vpw: calc(var(--card-w) * var(--visible) + var(--gap) * (var(--visible) - 1)); }
+    .now-showing .nav.left { left: calc(50% - var(--vpw)/2 - 36px); }
+    .now-showing .nav.right { right: calc(50% - var(--vpw)/2 - 36px); }
+  }
+
+  @media (max-width: 900px) {
+    /* small screens: show 4 cards */
+    .now-showing { --card-w: 160px; --visible: 4; --vpw: calc(var(--card-w) * var(--visible) + var(--gap) * (var(--visible) - 1)); }
+    .now-showing .nav.left { left: calc(50% - var(--vpw)/2 - 32px); }
+    .now-showing .nav.right { right: calc(50% - var(--vpw)/2 - 32px); }
+  }
+
+  @media (max-width: 560px) {
+    /* mobile: single large card */
+    .now-showing { --card-w: 80vw; --visible: 1; --vpw: var(--card-w); }
+    .now-showing .nav.left { left: calc(50% - var(--vpw)/2 - 20px); }
+    .now-showing .nav.right { right: calc(50% - var(--vpw)/2 - 20px); }
+  }
+}
+
+  h4.title1 {
+    font-size: clamp(20px, 2.5vw, 36px);
+    font-weight: 800;
+    letter-spacing: .5px;
+    margin: 45px 37% 25px;
+    //text-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+    --pink-deep: #e20074;
+    color: var(--pink-deep)
+  }

@@ -1,0 +1,341 @@
+<app-cinema-hero></app-cinema-hero>
+
+<!-- Thanh chọn vị trí + brand -->
+<div class="location-bar">
+  <div class="loc-left">
+    <label>Vị trí</label>
+    <div class="loc-controls">
+      <select class="loc-select" [(ngModel)]="selectedCity" (ngModelChange)="onFilterChange()">
+        <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+        <option value="Hà Nội">Hà Nội</option>
+        <option value="Đà Nẵng">Đà Nẵng</option>
+      </select>
+      <button class="nearby" type="button">
+        Gần bạn
+      </button>
+    </div>
+  </div>
+
+  <div class="brand-chips">
+    <button type="button" class="chip" [class.active]="brandFilter === 'all'" (click)="setBrandFilter('all')">
+      Tất cả
+    </button>
+    <button type="button" class="chip" [class.active]="brandFilter === 'Bloomatic'"
+      (click)="setBrandFilter('Bloomatic')">
+      Bloomatic
+    </button>
+    <button type="button" class="chip" [class.active]="brandFilter === 'CGV'" (click)="setBrandFilter('CGV')">
+      CGV
+    </button>
+    <button type="button" class="chip" [class.active]="brandFilter === 'Lotte'" (click)="setBrandFilter('Lotte')">
+      Lotte
+    </button>
+  </div>
+</div>
+
+<div class="schedule-wrap">
+  <!-- Cột trái: danh sách rạp -->
+  <div class="left">
+    <div class="search-box">
+      <input placeholder="Tìm theo tên rạp ..." [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()" />
+    </div>
+
+    <ul class="cinemas">
+      <li *ngFor="let c of visibleCinemas" (click)="selectCinema(c.id)" [class.active]="c.id === selectedCinemaId">
+        <div class="logo">
+          {{ c.brand === 'Bloomatic' ? 'B' : c.brand[0] }}
+        </div>
+        <div class="name">{{ c.name }}</div>
+        <div class="chev">›</div>
+      </li>
+    </ul>
+
+    <button class="more" *ngIf="canShowMore" type="button" (click)="toggleShowMore()">
+      {{ showAllCinemas ? 'Thu gọn' : 'Xem thêm' }}
+    </button>
+  </div>
+
+  <!-- Cột giữa: chi tiết rạp + phim -->
+  <div class="center">
+    <ng-container *ngIf="activeCinemaSchedule as cs; else noCinema">
+      <div class="theater-header">
+        <div class="logo-big">
+          {{ cs.cinema.brand === 'Bloomatic' ? 'B' : cs.cinema.brand[0] }}
+        </div>
+        <div class="info">
+          <h6>Lịch chiếu phim {{ cs.cinema.name }}</h6>
+          <div class="address">{{ cs.cinema.address }}</div>
+        </div>
+      </div>
+
+      <!-- Ngày -->
+      <div class="date-tabs">
+        <button *ngFor="let d of dates; let idx = index" class="date-ticket" [class.active]="idx === selectedIndex"
+          (click)="selectedIndex = idx">
+          <span class="ticket-hole"></span>
+          <span class="ticket-day">{{ d.day }}</span>
+          <span class="ticket-weekday">{{ d.weekday }}</span>
+        </button>
+      </div>
+
+      <!-- Danh sách phim theo rạp + ngày -->
+      <!-- <div class="movies"
+        *ngIf="filteredMovies.length; else noShowtimes"
+        [class.limited]="filteredMovies.length > 2">
+        <div class="movie" *ngFor="let m of filteredMovies">
+          <img class="poster" [src]="m.poster" [alt]="m.title" />
+          <div class="m-info">
+            <div class="m-title">
+              {{ m.title }}
+              <span class="badge" *ngIf="m.rating">★ {{ m.rating }}</span>
+            </div>
+            <div class="m-genres">{{ m.genres.join(', ') }}</div>
+
+            <div class="formats" *ngFor="let f of m.formats">
+              <div class="fmt-name">{{ f.name }}</div>
+              <div class="times">
+                <button class="stime" *ngFor="let t of f.times">
+                  {{ t }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+      <div class="movies" *ngIf="filteredMovies.length; else noShowtimes" [class.limited]="filteredMovies.length > 2">
+        <div class="movie" *ngFor="let m of filteredMovies">
+          <!-- Poster + age badge -->
+          <div class="movie-thumb">
+            <img class="poster" [src]="m.poster" [alt]="m.title" />
+            <!-- sau này bạn có thể đổi '16+' thành m.age -->
+            <span class="age-tag">16+</span>
+          </div>
+
+          <!-- Thông tin phim + suất chiếu -->
+          <div class="m-info">
+            <div class="m-title">{{ m.title }}</div>
+            <div class="m-genres">{{ m.genres.join(', ') }}</div>
+
+            <div class="formats" *ngFor="let f of m.formats">
+              <div class="fmt-name">{{ f.name }}</div>
+              <div class="times">
+                <button class="stime" *ngFor="let t of f.times" (click)="openSeatModal(m, f.name, t)">
+                  {{ t }}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <ng-template #noCinema>
+      <div class="theater-header">
+        <div class="info">
+          <h6>Không tìm thấy rạp phù hợp với bộ lọc hiện tại.</h6>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template #noShowtimes>
+      <div class="movies-empty">
+        Hiện chưa có suất chiếu cho bộ lọc (rạp, ngày, định dạng) bạn chọn.
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="right">
+    <!-- chỗ trống: sau này thêm map, ads, filter nâng cao -->
+  </div>
+</div>
+
+<!-- Modal chọn ghế -->
+<div class="seat-backdrop" *ngIf="seatModalOpen">
+  <div class="seat-modal">
+    <!-- header hồng ở trên -->
+    <div class="seat-modal-header">
+      <button class="back-btn" type="button" (click)="closeSeatModal()">
+        ‹
+      </button>
+      <div class="title">Mua vé xem phim</div>
+      <button class="close-btn" type="button" (click)="closeSeatModal()">×</button>
+    </div>
+
+    <!-- màn hình -->
+    <div class="seat-screen-label">
+      <div class="screen-bar"></div>
+      <div class="screen-text">Màn hình</div>
+    </div>
+
+    <!-- lưới ghế -->
+    <div class="seat-grid">
+      <div class="seat-row" *ngFor="let row of seats">
+        <button class="seat" *ngFor="let s of row" [ngClass]="{
+            'seat-booked': s.status === 'booked',
+            'seat-selected': s.status === 'selected',
+            'seat-vip': s.type === 'vip'
+          }" (click)="toggleSeat(s)">
+          {{ s.row }}{{ s.col }}
+        </button>
+      </div>
+    </div>
+
+    <!-- legend -->
+    <div class="seat-legend">
+      <div class="legend-item">
+        <span class="dot booked"></span> Đã đặt
+      </div>
+      <div class="legend-item">
+        <span class="dot selected"></span> Ghế bạn chọn
+      </div>
+      <div class="legend-item">
+        <span class="dot normal"></span> Ghế thường
+      </div>
+      <div class="legend-item">
+        <span class="dot vip"></span> Ghế VIP
+      </div>
+    </div>
+
+    <!-- thanh summary phía dưới -->
+    <div class="seat-summary" *ngIf="selectedShowtime as st">
+      <div class="summary-movie">
+        <div class="mv-title">{{ st.movieTitle }}</div>
+        <div class="mv-sub">
+          {{ st.cinemaName }} • {{ st.formatName }} • {{ st.time }}
+        </div>
+        <div class="mv-seats" *ngIf="selectedSeats.length">
+          Chỗ ngồi:
+          <span class="mv-seat-code" *ngFor="let s of selectedSeats">
+            {{ s.id }}
+          </span>
+        </div>
+      </div>
+
+      <div class="summary-price">
+        <div class="label">Tạm tính</div>
+        <div class="value">{{ formatCurrency(totalPrice) }}</div>
+        <button class="buy-btn" type="button" (click)="openConfirmModal()">
+          Mua vé
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-confirm" *ngIf="confirmModalOpen && selectedShowtime as st">
+    <div class="booking-card">
+      <!-- Cột trái: thông tin vé -->
+      <div class="booking-left">
+        <div class="booking-header">
+          <span class="age-badge">16+</span>
+          <div class="movie-title">{{ st.movieTitle }}</div>
+        </div>
+
+        <div class="booking-body">
+          <div class="booking-row">
+            <div class="label">Thời gian</div>
+            <div class="value">{{ st.time }}</div>
+            <div class="label">Ngày chiếu</div>
+            <div class="value">{{ selectedDateLabel }}</div>
+          </div>
+
+          <div class="booking-row">
+            <div class="label">Rạp</div>
+            <div class="value">
+              {{ st.cinemaName }}
+            </div>
+          </div>
+
+          <div class="booking-row">
+            <div class="label">Phòng chiếu</div>
+            <div class="value">Cinema 2</div>
+            <div class="label">Định dạng</div>
+            <div class="value">{{ st.formatName }}</div>
+          </div>
+
+          <div class="booking-row">
+            <div class="label">Ghế</div>
+            <div class="value">
+              <ng-container *ngFor="let s of selectedSeats; let last = last">
+                {{ s.id }}<span *ngIf="!last">, </span>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="booking-row">
+            <div class="label">Tạm tính</div>
+            <div class="value strong">
+              {{ formatCurrency(totalPrice) }}
+            </div>
+            <div class="label">Giảm giá</div>
+            <div class="value strong">0đ</div>
+          </div>
+
+          <div class="booking-row">
+            <div class="label">Thành tiền</div>
+            <div class="value strong highlight">
+              {{ formatCurrency(totalPrice) }}
+            </div>
+          </div>
+
+          <div class="booking-row full">
+            <div class="label">Mã giảm giá</div>
+            <div class="value">
+              <input class="coupon-input" type="text" placeholder="Nhập mã giảm giá" />
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-footer">
+          <button class="secondary" type="button" (click)="closeConfirmModal()">
+            Hủy
+          </button>
+          <button class="primary" type="button" (click)="proceedPayment()">
+            Tiến hành thanh toán
+          </button>
+        </div>
+      </div>
+
+      <!-- Cột phải: panel hồng + QR -->
+      <div class="booking-right">
+        <button class="booking-close" type="button" (click)="closeConfirmModal()">×</button>
+
+        <h3>Quét mã QR PayPal để thanh toán</h3>
+
+        <!-- Nếu đã tạo link PayPal -->
+        <!-- <qrcode *ngIf="paypalQrOpen" [qrdata]="paypalApproveUrl" [width]="220" [errorCorrectionLevel]="'M'">
+        </qrcode> -->
+        <qrcode *ngIf="paypalQrOpen" [qrdata]="paypalApproveUrl" [width]="220" [errorCorrectionLevel]="'M'">
+        </qrcode>
+
+        <!-- Chưa tạo link thì hiện placeholder -->
+        <div class="qr-placeholder" *ngIf="!paypalQrOpen">
+          Nhấn "Tiến hành thanh toán" để tạo mã QR.
+        </div>
+
+        <p class="hint">
+          Sử dụng ứng dụng PayPal hoặc Camera hỗ trợ QR để quét mã
+          hoặc thanh toán trực tiếp trên trình duyệt.
+        </p>
+
+        <div class="paypal-buttons-wrapper">
+          <div #paypalButtons id="paypal-buttons-modal"></div>
+        </div>
+
+
+        <!-- <button
+        class="open-browser"
+        type="button"
+        (click)="openPaypalInBrowser()"
+        [disabled]="!paypalQrOpen">
+        Thanh toán trên trình duyệt này
+      </button> -->
+      </div>
+    </div>
+  </div>
+
+
+
+</div>

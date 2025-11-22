@@ -1,0 +1,163 @@
+<!-- <app-header></app-header> -->
+
+
+<section class="detail-wrap">
+  <div class="left">
+    <div class="poster">
+      <img [src]="movie.poster" [alt]="movie.title" />
+      <button class="play" (click)="openTrailer(movie.trailerId)" aria-label="Play trailer">
+        <span class="triangle"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="meta-row">
+      <span class="badge-age">{{ movie.age }}</span>
+      <div class="title-wrap">
+        <h1 class="movie-title">{{ movie.title }}</h1>
+        <div class="sub">{{ movie.release }} · {{ (movie.genres || []).join(' · ') }}</div>
+      </div>
+    </div>
+
+    <em class="lead">The Legend Returns. The Stage Trembles.</em>
+
+    <h5 class="section">Nội dung</h5>
+    <p class="desc" [class.collapsed]="!showMore">{{ movie.description }}</p>
+    <button *ngIf="isLong" class="read-more" (click)="toggleShowMore()">{{ showMore ? 'Rút gọn' : 'Xem thêm' }}</button>
+
+    <div class="info-row">
+      <div>
+        <strong>Ngày chiếu</strong>
+        <div class="info-val">{{ movie.release }}</div>
+      </div>
+      <div>
+        <strong>Thể loại</strong>
+        <div class="info-val">{{ (movie.genres || []).join(', ') }}</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" (click)="openTrailer(movie.trailerId)"><i class="fa-solid fa-circle-play"></i> Xem
+        trailer</button>
+      <button class="btn ghost"><i class="fa-regular fa-star"></i> Xem review</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Showtimes / Sidebar ===== -->
+<section class="showtimes-grid">
+  <div class="schedule-col">
+    <div class="schedule-header">
+      <h3>Lịch chiếu {{ movie.title }}</h3>
+      <div class="controls">
+        <select class="loc-select" [(ngModel)]="selectedCity" (ngModelChange)="onFilterChange()">
+          <option value="Đà Nẵng">Đà Nẵng</option>
+          <option value="Hà Nội">Hà Nội</option>
+          <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+        </select>
+        <button class="btn small ghost">Gần bạn</button>
+      </div>
+    </div>
+
+    <!-- <div class="date-tabs" role="tablist">
+      <button class="tab" *ngFor="let d of dates; let idx = index" [class.active]="idx===0">{{ d.label }}</button>
+    </div> -->
+    <div class="date-tabs">
+      <button *ngFor="let d of dates; let idx = index" class="date-ticket" [class.active]="idx === selectedIndex"
+        (click)="selectedIndex = idx; onFilterChange()">
+        <span class="ticket-hole"></span>
+        <span class="ticket-day">{{ d.day }}</span>
+        <span class="ticket-weekday">{{ d.weekday }}</span>
+      </button>
+    </div>
+
+    <!-- Nếu có rạp thì hiển thị danh sách -->
+    <div *ngIf="filteredCinemas.length; else noShowtimes">
+      <div class="cinema-list">
+        <div class="cinema-card" *ngFor="let c of filteredCinemas" [class.expanded]="c.isExpanded">
+
+          <div class="cinema-header" (click)="toggleCinema(c.id)">
+            <div class="cinema-brand">
+              <img [src]="c.logoUrl" alt="logo" class="cinema-logo" />
+              <div class="cinema-meta">
+                <div class="cinema-name">{{ c.name }}</div>
+                <div class="cinema-addr">
+                  {{ c.address }}
+                  <a *ngIf="c.mapUrl" [href]="c.mapUrl" target="_blank">[ Bản đồ ]</a>
+                </div>
+              </div>
+            </div>
+
+            <button class="cinema-toggle" type="button" (click)="toggleCinema(c.id); $event.stopPropagation()">
+              <i class="fa-solid" [ngClass]="c.isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'">
+              </i>
+            </button>
+          </div>
+
+          <div class="cinema-body" [class.expanded]="c.isExpanded">
+            <div class="format-row">{{ c.formatLabel }}</div>
+            <div class="showtimes">
+              <button class="time" *ngFor="let t of getShowtimesForCinema(c)">
+                {{ t }}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Nếu KHÔNG có rạp nào khớp city + ngày + phim -->
+    <ng-template #noShowtimes>
+      <div class="no-showtimes">
+        Úi, Suất chiếu không tìm thấy cho phim này tại khu vực và ngày bạn chọn.
+      </div>
+    </ng-template>
+
+  </div>
+
+
+  <aside class="sidebar-col">
+  <h4>Phim đang chiếu</h4>
+
+  <div class="now-list">
+    <a
+      class="now-item"
+      href="#"
+      *ngFor="let m of nowPlaying"
+      [class.active]="m.id === activeNowPlayingId"
+      (click)="selectNowPlaying(m); $event.preventDefault()">
+
+      <div class="now-thumb">
+        <img [src]="m.movie.poster" [alt]="m.movie.title" />
+        <span
+          class="now-age"
+          [ngClass]="{
+            'now-age-yellow': m.ageClass === 'yellow',
+            'now-age-orange': m.ageClass === 'orange',
+            'now-age-green': m.ageClass === 'green',
+            'now-age-blue': m.ageClass === 'blue'
+          }">
+          {{ m.movie.age }}
+        </span>
+      </div>
+
+      <div class="now-info">
+        <div class="now-title-row">
+          <div class="now-title">{{ m.movie.title }}</div>
+          <span *ngIf="m.badge" class="now-badge">{{ m.badge }}</span>
+        </div>
+        <div class="now-genre">
+          {{ (m.movie.genres || []).join(', ') }}
+        </div>
+        <div class="now-rating">
+          <i class="fa-solid fa-star"></i>
+          <span>{{ m.rating }}</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</aside>
+
+</section>

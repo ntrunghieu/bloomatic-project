@@ -1,0 +1,93 @@
+/* Footer layout and styling to match the provided mock */
+.footer-59391 {
+	background: #ffffff;
+	color: #222;
+	font-family: inherit;
+	padding: 2.25rem 0 1.5rem;
+}
+.footer-59391 .border-bottom {
+	border-bottom: 1px solid #e9eef5;
+}
+.footer-59391 .container { max-width: 1100px; }
+
+/* Top area: subscribe / links / social */
+.footer-59391 .subscribe {
+	display: flex;
+	align-items: center;
+}
+.footer-59391 .subscribe .form-group {
+	display: flex;
+	width: 100%;
+}
+.footer-59391 .subscribe .form-control {
+	border: 1px solid #e3e8ef;
+	padding: 0.55rem 0.9rem;
+	border-radius: 999px;
+	box-shadow: none;
+	width: 100%;
+}
+.footer-59391 .subscribe button {
+	margin-left: 0.5rem;
+	background: #111827;
+	color: #fff;
+	border: none;
+	padding: 0.5rem 0.7rem;
+	border-radius: 8px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.footer-59391 .nav-links {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	gap: 1.25rem;
+	justify-content: center;
+	align-items: center;
+}
+.footer-59391 .nav-links a {
+	color: #222;
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.footer-59391 .social { justify-content: flex-end; }
+.footer-59391 .social li { display: inline-block; margin-left: 0.6rem; }
+.footer-59391 .social a {
+	display: inline-flex;
+	width: 36px;
+	height: 36px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: #fff;
+	color: #222;
+	text-decoration: none;
+	box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+/* Bottom area */
+.footer-59391 .site-logo a {
+	font-weight: 800;
+	font-size: 1.05rem;
+	color: #111827;
+	text-decoration: none;
+}
+.footer-59391 .row.align-items-center { align-items: center; }
+.footer-59391 .nav-left { justify-content: flex-start; }
+.footer-59391 p.text-muted { color: #6b7280; margin: 0; }
+
+/* Responsive stacking */
+@media (max-width: 767px) {
+	.footer-59391 .row { text-align: center; }
+	.footer-59391 .col-lg-3,
+	.footer-59391 .col-lg-4,
+	.footer-59391 .col-lg-6 { width: 100%; display: block; }
+	.footer-59391 .social { justify-content: center; margin-top: 0.5rem; }
+	.footer-59391 .subscribe { justify-content: center; }
+	.footer-59391 .nav-links { flex-wrap: wrap; gap: .6rem; }
+	.footer-59391 .site-logo { order: 2; }
+}
+

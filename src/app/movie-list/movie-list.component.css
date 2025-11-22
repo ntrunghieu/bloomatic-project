@@ -1,0 +1,192 @@
+.movie-list-page {
+  max-width: 1200px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* header + filters */
+.movie-list-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.movie-list-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e20074; /* hồng giống MoMo, chỉnh tuỳ ý */
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filters select,
+.search-box input {
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 0 10px;
+  font-size: 13px;
+  background: #ffffff;
+  min-width: 120px;
+}
+
+.filters select:focus,
+.search-box input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+/* search box */
+.search-box {
+  position: relative;
+  flex: 1 1 220px;
+}
+
+.search-box input {
+  width: 100%;
+  padding-right: 30px;
+}
+
+.search-box i {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* grid phim */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 18px 16px;
+}
+
+/* card phim */
+.movie-card {
+  cursor: pointer;
+}
+
+.poster-wrapper {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.15);
+}
+
+.poster-wrapper img {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+/* badge độ tuổi */
+.age-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #f97316;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+}
+
+/* nút play */
+.play-btn {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.play-btn i {
+  margin-left: 2px;
+}
+
+.poster-wrapper:hover .play-btn {
+  transform: scale(1.05);
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* text dưới poster */
+.movie-title {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.movie-genres {
+  margin-top: 2px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* phân trang */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.page-btn {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* no result */
+.no-result {
+  padding: 40px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* responsive */
+@media (max-width: 640px) {
+  .movie-list-header {
+    align-items: flex-start;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

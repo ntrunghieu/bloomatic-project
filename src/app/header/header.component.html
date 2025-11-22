@@ -1,0 +1,205 @@
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" [routerLink]="['/']" href="/">
+      <img src="assets/logomini.jpeg" alt="BloomCinema" />
+      <span class="kv">Đặt vé<br /><b>xem phim</b></span>
+    </a>
+    <nav class="main-nav">
+      <a [routerLink]="['/schedule']" href="#">Lịch chiếu</a>
+      <a href="#">Rạp chiếu</a>
+      <a href="#">Phim chiếu</a>
+      <a href="#">Review phim</a>
+      <a href="#">Top phim</a>
+      <a href="#">Blog phim</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="auth-btn outline" (click)="openRegister()">
+        Đăng ký
+      </button>
+      <button class="auth-btn primary" (click)="openLogin()">
+        Đăng nhập
+      </button>
+
+      <button class="icon-btn" aria-label="Tìm kiếm" (click)="toggleSearch()">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </div>
+
+    <!-- <button class="icon-btn" aria-label="Tìm kiếm" (click)="toggleSearch()">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button> -->
+  </div>
+
+  <!-- Overlay làm mờ nền -->
+  <div class="overlay" *ngIf="searchOpen" (click)="closeSearch()"></div>
+
+  <!-- Popover tìm kiếm -->
+  <div class="search-pop" *ngIf="searchOpen" (click)="$event.stopPropagation()">
+    <div class="caret"></div>
+
+    <form class="searchbox" (submit)="submit()">
+      <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+      <input type="text" [(ngModel)]="q" name="q" placeholder="Nhập tên phim" autofocus />
+      <button type="button" class="clear" *ngIf="q" (click)="q=''">✕</button>
+    </form>
+
+    <div class="panel-scroll">
+      <div class="section">
+        <div class="sec-title">TÌM KIẾM GẦN ĐÂY</div>
+        <div class="recent" *ngFor="let r of recent">
+          <span class="arrow"><i class="fa-solid fa-arrow-right"></i></span> {{ r }}
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <div class="sec-title">PHIM ĐANG CHIẾU</div>
+
+        <a class="movie" *ngFor="let m of nowShowing" href="#">
+          <img class="thumb" [src]="m.poster" [alt]="m.title" />
+          <div class="info">
+            <div class="title">{{ m.title }}</div>
+            <div class="genres">{{ m.genres }}</div>
+            <div class="meta">
+              <span class="star">★</span>{{ m.rating.toFixed(1) }}
+              <span class="badge" *ngIf="m.nowPlaying">🔴 ĐANG CHIẾU</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/"><i class="fa-solid fa-house"></i></a>
+  <span>›</span>
+  <a href="/cinema">Cinema</a>
+  <span>›</span>
+  <span aria-current="page">Phim chiếu</span>
+</nav>
+
+<!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+<div class="auth-backdrop" *ngIf="authModalOpen" (click)="closeAuth()">
+  <div class="auth-modal" (click)="$event.stopPropagation()">
+    <button class="auth-close" type="button" (click)="closeAuth()">×</button>
+
+    <ng-container [ngSwitch]="authMode">
+
+      <!-- ===== ĐĂNG NHẬP ===== -->
+      <form *ngSwitchCase="'login'" (ngSubmit)="submitLogin()" #loginForm="ngForm">
+        <h2>Đăng nhập</h2>
+
+        <button type="button" class="auth-google-btn">
+          <i class="fa-brands fa-google"></i>
+          Đăng nhập với Google
+        </button>
+
+        <div class="auth-divider">HOẶC</div>
+
+        <div class="auth-form-field">
+          <label>Email</label>
+          <input
+            type="email"
+            name="loginEmail"
+            [(ngModel)]="loginModel.email"
+            required
+          />
+        </div>
+
+        <div class="auth-form-field">
+          <label>Mật khẩu</label>
+          <input
+            type="password"
+            name="loginPassword"
+            [(ngModel)]="loginModel.password"
+            required
+          />
+        </div>
+
+        <div class="auth-extra">
+          <a href="#" class="forgot-link">Quên mật khẩu?</a>
+        </div>
+
+        <button class="auth-submit" type="submit">
+          Đăng nhập
+        </button>
+
+        <div class="auth-switch">
+          <span>Bạn chưa có tài khoản? </span>
+          <button type="button" class="link-btn" (click)="openRegister()">
+            Đăng ký?
+          </button>
+        </div>
+      </form>
+
+      <!-- ===== ĐĂNG KÝ ===== -->
+      <form *ngSwitchCase="'register'" (ngSubmit)="submitRegister()" #registerForm="ngForm">
+        <h2>Đăng ký</h2>
+
+        <div class="auth-form-field">
+          <label>Họ tên</label>
+          <input
+            type="text"
+            name="fullName"
+            [(ngModel)]="registerModel.fullName"
+            required
+          />
+        </div>
+
+        <div class="auth-form-grid-2">
+          <div class="auth-form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="regEmail"
+              [(ngModel)]="registerModel.email"
+              required
+            />
+          </div>
+          <div class="auth-form-field">
+            <label>Số điện thoại</label>
+            <input
+              type="tel"
+              name="phone"
+              [(ngModel)]="registerModel.phone"
+            />
+          </div>
+        </div>
+
+        <div class="auth-form-field">
+          <label>Mật khẩu</label>
+          <input
+            type="password"
+            name="regPassword"
+            [(ngModel)]="registerModel.password"
+            required
+          />
+        </div>
+
+        <div class="auth-form-field">
+          <label>Xác nhận mật khẩu</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            [(ngModel)]="registerModel.confirmPassword"
+            required
+          />
+        </div>
+
+        <button class="auth-submit" type="submit">
+          Đăng ký
+        </button>
+
+        <div class="auth-switch">
+          <span>Bạn đã có tài khoản? </span>
+          <button type="button" class="link-btn" (click)="openLogin()">
+            Đăng nhập?
+          </button>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</div>

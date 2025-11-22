@@ -1,0 +1,96 @@
+<div class="movie-list-page">
+  <!-- Tiêu đề + filter -->
+  <div class="movie-list-header">
+    <h2>Tìm phim chiếu rạp</h2>
+
+    <div class="filters">
+      <select
+        [(ngModel)]="genreFilter"
+        (ngModelChange)="onFilterChange()">
+        <option *ngFor="let g of genreOptions" [value]="g.value">
+          {{ g.label }}
+        </option>
+      </select>
+
+      <select
+        [(ngModel)]="countryFilter"
+        (ngModelChange)="onFilterChange()">
+        <option *ngFor="let c of countryOptions" [value]="c.value">
+          {{ c.label }}
+        </option>
+      </select>
+
+      <select
+        [(ngModel)]="yearFilter"
+        (ngModelChange)="onFilterChange()">
+        <option *ngFor="let y of yearOptions" [value]="y.value">
+          {{ y.label }}
+        </option>
+      </select>
+
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Tìm theo tên phim..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onFilterChange()" />
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid phim -->
+  <div *ngIf="pagedMovies.length; else noResult">
+    <div class="movies-grid">
+      <article class="movie-card" *ngFor="let movie of pagedMovies">
+        <div class="poster-wrapper">
+          <img [src]="movie.posterUrl" [alt]="movie.title" />
+
+          <div class="age-badge" *ngIf="movie.ageBadge">
+            {{ movie.ageBadge }}
+          </div>
+
+          <button class="play-btn" type="button">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+
+        <h3 class="movie-title">{{ movie.title }}</h3>
+        <p class="movie-genres">
+          {{ movie.genres.join(', ') }}
+        </p>
+      </article>
+    </div>
+
+    <!-- Phân trang -->
+    <div class="pagination">
+      <button
+        class="page-btn"
+        (click)="prevPage()"
+        [disabled]="page === 1">
+        ‹
+      </button>
+
+      <button
+        class="page-btn"
+        *ngFor="let p of pages"
+        (click)="goToPage(p)"
+        [class.active]="p === page">
+        {{ p }}
+      </button>
+
+      <button
+        class="page-btn"
+        (click)="nextPage()"
+        [disabled]="page === totalPages">
+        ›
+      </button>
+    </div>
+  </div>
+
+  <ng-template #noResult>
+    <div class="no-result">
+      Không tìm thấy phim nào phù hợp.
+    </div>
+  </ng-template>
+</div>
