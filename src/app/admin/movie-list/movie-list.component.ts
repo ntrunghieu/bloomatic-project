@@ -6,7 +6,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-movie-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, NgxPaginationModule],
+  imports: [CommonModule, RouterLink, NgxPaginationModule],
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.css'
 })
@@ -36,7 +36,7 @@ export class MovieListComponent {
       createdDate: '13-04-2024'
     },
     {
-      id: 2,
+      id: 3,
       name: 'Lật Mặt 7: Một Điều Ước',
       releaseYear: 2024,
       genres: ['Tâm lý', 'Tình cảm'],
@@ -45,7 +45,7 @@ export class MovieListComponent {
       createdDate: '13-04-2024'
     },
     {
-      id: 2,
+      id: 4,
       name: 'Lật Mặt 7: Một Điều Ước',
       releaseYear: 2024,
       genres: ['Tâm lý', 'Tình cảm'],
@@ -54,7 +54,7 @@ export class MovieListComponent {
       createdDate: '13-04-2024'
     },
     {
-      id: 2,
+      id: 5,
       name: 'Lật Mặt 7: Một Điều Ước',
       releaseYear: 2024,
       genres: ['Tâm lý', 'Tình cảm'],

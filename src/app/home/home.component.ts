@@ -32,7 +32,7 @@ type Movie = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NgFor, NgIf, RouterModule, CinemaHeroComponent, FooterComponent, TaglineComponent, MovieListComponent],
+  imports: [NgFor, NgIf, RouterModule, CinemaHeroComponent, TaglineComponent, MovieListComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

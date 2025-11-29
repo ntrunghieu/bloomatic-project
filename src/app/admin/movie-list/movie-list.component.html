@@ -23,9 +23,9 @@
             <thead>
                 <tr>
                     <th>Tên phim</th>
-                    <th>Năm phát hành</th>
-                    <th>Thể loại</th>
-                    <th>Lịch chiếu</th>
+                    <th hidden>Năm phát hành</th>
+                    <th>Thể loại</th>           
+                    <th>Ngày khởi chiếu</th>
                     <th>Trạng thái</th>
                     <th>Ngày tạo</th>
                 </tr>
@@ -34,14 +34,17 @@
             <tbody>
                 <tr *ngFor="let m of movies | paginate: { itemsPerPage: pageSize, currentPage: page }">
                     <td class="movie-name">
-                        {{ m.name }}
+                        <a class="movie-link" [routerLink]="['/admin/movies', m.id]">
+                            {{ m.name }}
+                        </a>
                     </td>
-                    <td>{{ m.releaseYear }}</td>
+                    <td hidden>{{ m.releaseYear }}</td>
                     <td>
                         <span class="badge badge-genre" *ngFor="let g of m.genres">
                             {{ g }}
                         </span>
                     </td>
+                    
                     <td>
                         <span class="badge badge-date">
                             {{ m.showDate }}

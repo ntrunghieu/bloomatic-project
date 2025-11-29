@@ -1,0 +1,72 @@
+<div class="page-wrap">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <span>Dashboard</span>
+    <span>/</span>
+    <span>Danh sách rạp chiếu</span>
+  </nav>
+
+  <div class="header-row">
+    <div class="left">
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="goCreate()"
+      >
+        + Tạo rạp chiếu
+      </button>
+      <button
+        class="btn-outline"
+        type="button"
+        (click)="refresh()"
+      >
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="cinema-table">
+      <thead>
+        <tr>
+          <th>Tên rạp chiếu</th>
+          <th>Địa chỉ</th>
+          <th>Ngày tạo</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let c of cinemas | paginate: { itemsPerPage: itemsPerPage, currentPage: page }"
+        >
+          <td>
+            <button
+              type="button"
+              class="link-button"
+              (click)="openDetail(c)"
+            >
+              {{ c.name }}
+            </button>
+          </td>
+          <td>{{ c.address }}</td>
+          <td>{{ formatDate(c.createdAt) }}</td>
+        </tr>
+
+        <tr *ngIf="cinemas.length === 0">
+          <td colspan="3" class="empty-row">
+            Chưa có rạp chiếu nào.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-wrap" *ngIf="cinemas.length > itemsPerPage">
+      <pagination-controls
+        previousLabel="‹"
+        nextLabel="›"
+        (pageChange)="page = $event"
+      >
+      </pagination-controls>
+    </div>
+  </div>
+</div>

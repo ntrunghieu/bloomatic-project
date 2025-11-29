@@ -6,7 +6,7 @@ import { HeaderComponent } from '../header/header.component';
 @Component({
   standalone: true,
   selector: 'app-seats',
-  imports: [CommonModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './seats.component.html',
   styleUrls: ['./seats.component.scss']
 })

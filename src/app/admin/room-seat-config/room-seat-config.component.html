@@ -1,0 +1,101 @@
+<div class="seat-config-page">
+    <div class="left-panel">
+        <!-- Nút quay lại -->
+        <div class="top-actions">
+            <button type="button" class="back-btn" (click)="goBackToCinema()">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+        <h2>Cấu hình ghế – {{ room.name }}</h2>
+
+        <div class="info-grid">
+            <div>
+                <div class="label">Loại phòng</div>
+                <div class="value">{{ room.type }}</div>
+            </div>
+            <div>
+                <div class="label">Hàng ghế</div>
+                <div class="value">{{ room.rows }}</div>
+            </div>
+            <div>
+                <div class="label">Cột ghế</div>
+                <div class="value">{{ room.cols }}</div>
+            </div>
+            <div>
+                <div class="label">Tổng ghế</div>
+                <div class="value">{{ room.rows * room.cols }}</div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="seat-icon standard"></span> Ghế thường
+            </div>
+            <div class="legend-item">
+                <span class="seat-icon vip"></span> Ghế VIP
+            </div>
+            <div class="legend-item">
+                <span class="seat-icon couple"></span> Ghế couple
+            </div>
+            <div class="legend-item">
+                <span class="seat-icon block"></span> Ghế khoá
+            </div>
+        </div>
+
+        <div class="type-buttons">
+            <button type="button" [class.active]="selectedSeatType === 'STANDARD'" (click)="setSeatType('STANDARD')">
+                Ghế thường
+            </button>
+            <button type="button" [class.active]="selectedSeatType === 'VIP'" (click)="setSeatType('VIP')">
+                Ghế VIP
+            </button>
+            <button type="button" [class.active]="selectedSeatType === 'COUPLE'" (click)="setSeatType('COUPLE')">
+                Ghế couple
+            </button>
+            <button type="button" [class.active]="selectedSeatType === 'BLOCK'" (click)="setSeatType('BLOCK')">
+                Khoá ghế
+            </button>
+        </div>
+
+        <button class="btn-primary" type="button" (click)="saveConfig()">
+            Lưu cấu hình
+        </button>
+    </div>
+
+    <div class="right-panel">
+        <div class="screen-label">MÀN HÌNH</div>
+
+        <div class="seat-grid">
+            <div class="seat-row" *ngFor="let row of seats; let r = index">
+                <div class="row-label">
+                    {{ rowLabel(r) }}
+                </div>
+
+
+                <!-- <button type="button" class="seat-cell" *ngFor="let cell of row" [ngClass]="cell.type.toLowerCase()"
+                    (click)="toggleSeat(cell)">
+                    {{ cell.id }}
+                </button> -->
+                <!-- <button type="button" class="seat-cell" *ngFor="let cell of row" [ngClass]="cell.type.toLowerCase()"
+                    (mousedown)="onSeatMouseDown(cell, $event)" (mouseenter)="onSeatMouseEnter(cell, $event)">
+                    {{ cell.id }}
+                </button> -->
+                <!-- <button type="button" class="seat-cell" *ngFor="let cell of row; let c = index"
+                    [ngClass]="cell.type.toLowerCase()" (click)="toggleSeat(r, c)">
+                    {{ cell.id }}
+                </button> -->
+                <!-- <button type="button" class="seat-cell" *ngFor="let cell of row; let c = index"
+                    [ngClass]="cell.type.toLowerCase()" (mousedown)="onSeatMouseDown(r, c, $event)"
+                    (mouseenter)="onSeatMouseEnter(r, c, $event)" (click)="$event.preventDefault()">
+                    {{ cell.id }}
+                </button> -->
+                <button type="button" class="seat-cell" *ngFor="let cell of row; let c = index"
+                    [ngClass]="seatClasses(cell)" (mousedown)="onSeatMouseDown(r, c, $event)"
+                    (mouseenter)="onSeatMouseEnter(r, c, $event)">
+                    {{ seatLabel(cell) }}
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>

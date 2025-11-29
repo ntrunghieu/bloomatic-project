@@ -1,0 +1,138 @@
+<div class="rooms-page">
+  <div class="rooms-header">
+    <h2>Phòng chiếu</h2>
+
+    <button class="btn-primary" type="button" (click)="openCreateModal()">
+      + Thêm phòng chiếu
+    </button>
+  </div>
+
+  <div class="rooms-card">
+    <table class="rooms-table">
+      <thead>
+        <tr>
+          <th>Tên phòng</th>
+          <th>Loại phòng</th>
+          <th>Hàng ghế</th>
+          <th>Cột ghế</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rooms">
+          <td>{{ r.name }}</td>
+          <td>{{ r.type }}</td>
+          <td>{{ r.rows }}</td>
+          <td>{{ r.cols }}</td>
+          <td class="action-col">
+            <button
+              type="button"
+              class="link-button"
+              (click)="goToSeatConfig(r)"
+            >
+              Cấu hình ghế
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="rooms.length === 0">
+          <td colspan="5" class="empty-row">
+            Chưa có phòng chiếu nào.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- debug tạm: xem flag có đổi không -->
+  <!-- <p>isCreateModalOpen: {{ isCreateModalOpen }}</p> -->
+
+  <!-- Modal tạo phòng chiếu -->
+<!-- Modal tạo phòng chiếu -->
+<div class="modal-backdrop" *ngIf="isCreateModalOpen">
+  <div class="room-modal">
+    <div class="room-modal__header">
+      <h3>Tạo phòng chiếu</h3>
+      <button
+        type="button"
+        class="room-modal__close"
+        (click)="closeCreateModal()"
+      >
+        ×
+      </button>
+    </div>
+
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <div class="room-modal__body">
+        <!-- Tên phòng -->
+        <div class="field-group">
+          <label class="field-label">
+            Tên phòng chiếu <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            class="field-input"
+            placeholder="Nhập tên phòng chiếu"
+            formControlName="name"
+          />
+          <div
+            class="error"
+            *ngIf="
+              createForm.get('name')?.touched &&
+              createForm.get('name')?.invalid
+            "
+          >
+            Vui lòng nhập tên phòng chiếu
+          </div>
+        </div>
+
+        <!-- Loại phòng -->
+        <div class="field-group">
+          <label class="field-label">
+            Loại phòng chiếu <span class="required">*</span>
+          </label>
+          <select class="field-input" formControlName="type">
+            <option *ngFor="let t of roomTypes" [value]="t">
+              {{ t }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Số hàng + số cột -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">
+              Số hàng <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="field-input"
+              placeholder="Enter total rows"
+              formControlName="rows"
+            />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              Số cột <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="field-input"
+              placeholder="Enter total columns"
+              formControlName="cols"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="room-modal__footer">
+        <button class="btn-primary" type="submit">
+          Lưu
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div>

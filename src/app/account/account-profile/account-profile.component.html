@@ -1,0 +1,20 @@
+<h2>Thông tin cá nhân</h2>
+
+  <div class="cover">
+    <div class="avatar">{{ initials }}</div>
+  </div>
+
+  <form [formGroup]="f" (ngSubmit)="submit()" class="form">
+    <label>Họ tên</label>
+    <input formControlName="fullName" type="text" />
+
+    <label>Số điện thoại</label>
+    <input formControlName="phone" type="text" />
+
+    <label>Email</label>
+    <input formControlName="email" type="email" />
+
+    <button class="primary" type="submit" [disabled]="f.invalid || f.pristine">Lưu thông tin</button>
+    <span class="msg" *ngIf="msg && msg.length">{{ msg }}</span>
+
+  </form>

@@ -1,0 +1,154 @@
+<main class="account-page">
+  <div class="account-wrap">
+    <nav class="breadcrumb">
+      <a routerLink="/">Trang chủ</a>
+      <span>/</span>
+      <span>Lịch sử mua vé</span>
+    </nav>
+
+    <div class="account-layout">
+      <!-- Sidebar -->
+      <aside class="account-sidebar">
+        <div class="sidebar-section">
+          <button class="sidebar-item">Thông tin tài khoản</button>
+          <button class="sidebar-item">Đổi mật khẩu</button>
+        </div>
+        <div class="sidebar-section">
+          <button class="sidebar-item active">Lịch sử mua vé</button>
+        </div>
+      </aside>
+
+      <!-- Nội dung -->
+      <section class="account-content">
+        <header class="content-header">
+          <h1>Lịch sử mua vé</h1>
+        </header>
+
+        <div class="history-card">
+          <div class="table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Ngày giao dịch</th>
+                  <th>Mã đơn hàng</th>
+                  <th>Tên phim</th>
+                  <th class="amount-col">Số tiền</th>
+                  <th class="action-col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let o of orders">
+                  <td>{{ formatDate(o.transactionDate) }}</td>
+                  <td>{{ o.id }}</td>
+                  <td class="movie-cell">{{ o.movieTitle }}</td>
+                  <td class="amount-col">
+                    {{ formatCurrency(o.totalAmount) }}
+                  </td>
+                  <td class="action-col">
+                    <button
+                      type="button"
+                      class="link-button"
+                      (click)="viewDetail(o)">
+                      Xem chi tiết
+                    </button>
+                  </td>
+                </tr>
+
+                <tr *ngIf="orders.length === 0">
+                  <td colspan="5" class="empty-row">
+                    Bạn chưa có giao dịch nào.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============ MODAL CHI TIẾT VÉ ============ -->
+  <div
+    class="ticket-detail-backdrop"
+    *ngIf="detailOpen && selectedOrder as o">
+    <div class="ticket-detail-card">
+      <button class="td-close" type="button" (click)="closeDetail()">×</button>
+
+      <!-- Header: poster + info -->
+      <div class="td-header">
+        <div class="td-poster">
+          <img [src]="o.posterUrl" [alt]="o.movieTitle" />
+        </div>
+        <div class="td-meta">
+          <div class="td-title">{{ o.movieTitle }}</div>
+          <div class="td-sub">
+            {{ o.language }}, {{ o.format }}
+          </div>
+          <div class="td-sub">{{ o.showTimeLabel }}</div>
+          <div class="td-sub">{{ o.cinemaName }}</div>
+          <div class="td-sub small">{{ o.cinemaAddress }}</div>
+        </div>
+        <div class="td-tag">
+          E-Ticket
+        </div>
+      </div>
+
+      <!-- Bar "Tap to hide details" -->
+      <div hidden class="td-swipe-bar">
+        <div class="handle"></div>
+        <span>Tap to hide details</span>
+      </div>
+
+      <!-- Body -->
+      <div class="td-body">
+        <div class="td-ticket-count">
+          {{ o.ticketCount }} Vé
+        </div>
+
+        <div class="td-screen">{{ o.screenName }}</div>
+        <div class="td-seat">{{ o.seatLabel }}</div>
+
+        <div class="td-qr-wrapper">
+          <qrcode
+            [qrdata]="o.bookingCode"
+            [width]="150"
+            [errorCorrectionLevel]="'M'">
+          </qrcode>
+        </div>
+
+        <div class="td-booking-id">
+          MÃ ĐẶT VÉ: <span>{{ o.bookingCode }}</span>
+        </div>
+
+        <div hidden class="td-note">
+          Cancellation not available for this venue
+        </div>
+
+        <div hidden class="td-support">
+          <span class="support-icon">☎</span>
+          <span>Contact support</span>
+        </div>
+      </div>
+
+      <!-- Footer: giá tiền -->
+      <div class="td-footer">
+        <div class="td-footer-row total">
+          <span>Total Amount</span>
+          <span>{{ formatCurrency(o.totalAmount) }}</span>
+        </div>
+        <div class="td-footer-row">
+          <span>Ticket price ({{ o.ticketCount }})</span>
+          <span>{{ formatCurrency(o.ticketPrice) }}</span>
+        </div>
+        <div class="td-footer-row">
+          <span>Convenience fee</span>
+          <span>{{ formatCurrency(o.convenienceFee) }}</span>
+        </div>
+        <div class="td-footer-row">
+          <span>Discount</span>
+          <span>-{{ formatCurrency(o.discount) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

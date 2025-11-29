@@ -9,7 +9,7 @@ type AdminView = 'dashboard' | 'movieList' | 'movieCreate';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })

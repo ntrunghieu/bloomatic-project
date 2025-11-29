@@ -1,0 +1,106 @@
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <span>Dashboard</span>
+      <span>/</span>
+      <span>Danh sách đơn hàng</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="top-bar">
+      <button type="button" class="btn btn-outline" (click)="refresh()">
+        <i class="fa-solid fa-rotate-right"></i>
+        Refresh
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>
+              <div class="th-with-search">
+                <span>Mã đơn hàng</span>
+                <input type="text" placeholder="Tìm mã..." [(ngModel)]="searchOrderCode"
+                  (ngModelChange)="applyFilters()" />
+              </div>
+            </th>
+            <th>
+              <div class="th-with-search">
+                <span>Tên phim</span>
+                <input type="text" placeholder="Tìm tên phim..." [(ngModel)]="searchMovieTitle"
+                  (ngModelChange)="applyFilters()" />
+              </div>
+            </th>
+            <th>Suất chiếu</th>
+            <th>Phòng chiếu</th>
+            <th>Trạng thái</th>
+            <th>Tổng tiền</th>
+            <th>Ngày đặt</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="
+              let o of filteredOrders
+                | paginate: { itemsPerPage: pageSize, currentPage: page }
+            ">
+            <td>
+              <a class="link-primary" [routerLink]="['/admin/orders', o.id]">
+                {{ o.code }}
+              </a>
+            </td>
+            <td>
+              <a class="link-primary" [routerLink]="['/admin/orders', o.id]">
+                {{ o.movieTitle }}
+              </a>
+            </td>
+            <td>
+              <div class="showtime-cell">
+                <span class="time-chip">{{ o.showTimeRange }}</span>
+                <span class="date-chip">{{ o.showDate }}</span>
+              </div>
+            </td>
+            <td>{{ o.roomName }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="statusClass(o.status)">
+                {{ o.status }}
+              </span>
+            </td>
+            <td>{{ formatCurrency(o.totalAmount) }}đ</td>
+            <td>{{ o.bookedDate }}</td>
+          </tr>
+
+          <tr *ngIf="filteredOrders.length === 0">
+            <td colspan="7" class="empty-row">
+              Không tìm thấy đơn hàng nào phù hợp.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer" *ngIf="filteredOrders.length > 0">
+      <div class="left-footer">
+        <span>
+          Tổng: {{ filteredOrders.length }} đơn
+        </span>
+      </div>
+
+      <div class="right-footer">
+        <div class="page-size">
+          <span>Hiển thị</span>
+          <select [(ngModel)]="pageSize" (change)="page = 1">
+            <option [ngValue]="5">5 / page</option>
+            <option [ngValue]="10">10 / page</option>
+            <option [ngValue]="20">20 / page</option>
+          </select>
+        </div>
+
+        <pagination-controls (pageChange)="page = $event" previousLabel="‹" nextLabel="›">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,179 @@
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <span>Dashboard</span>
+      <span>/</span>
+      <span>Danh sách lịch chiếu</span>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-primary" type="button" (click)="openCreateModal()">
+        + Tạo lịch chiếu
+      </button>
+      <button class="btn-outline" type="button" (click)="refresh()">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-toolbar">
+      <div class="search-box">
+        <input type="text" placeholder="Tìm theo tên phim..." [(ngModel)]="searchTerm" />
+        <span class="search-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-movie">
+              Phim chiếu
+            </th>
+            <th class="col-date">
+              <button class="th-sort" type="button" (click)="toggleSort('date')">
+                Thời gian chiếu
+                <span class="sort-icon" [class.active]="sortField === 'date'">
+                  <i class="fa-solid" [ngClass]="{
+                      'fa-arrow-up-long': sortField === 'date' && sortDir === 'asc',
+                      'fa-arrow-down-long':
+                        sortField === 'date' && sortDir === 'desc'
+                    }"></i>
+                </span>
+              </button>
+            </th>
+            <th class="col-status">
+              <button class="th-sort" type="button" (click)="toggleSort('status')">
+                Phân loại
+                <span class="sort-icon" [class.active]="sortField === 'status'">
+                  <i class="fa-solid" [ngClass]="{
+                      'fa-arrow-up-long':
+                        sortField === 'status' && sortDir === 'asc',
+                      'fa-arrow-down-long':
+                        sortField === 'status' && sortDir === 'desc'
+                    }"></i>
+                </span>
+              </button>
+            </th>
+            <!-- <th> Giá cơ sở </th> -->
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="
+              let st of filteredShowtimes
+                | paginate: { itemsPerPage: pageSize, currentPage: page }
+            ">
+            <td>
+              <a href="javascript:void(0)" class="movie-link">
+                {{ getMovieTitle(st.movieId) }}
+              </a>
+            </td>
+            <td>
+              {{ st.startDate | date : 'dd-MM-yyyy' }} –
+              {{ st.endDate | date : 'dd-MM-yyyy' }}
+            </td>
+            <td>
+              <span class="badge" [ngClass]="statusClass(getStatus(st))">
+                {{ getStatus(st) }}
+              </span>
+            </td>
+            <!-- <td>{{ st.basePrice | currency:'VND':'symbol':'1.0-0':'vi-VN' }}</td> -->
+            <td class="actions">
+              <button type="button" class="icon-btn edit" title="Chỉnh sửa" (click)="openEditModal(st)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="icon-btn delete" title="Xoá" (click)="deleteShowtime(st)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredShowtimes.length === 0">
+            <td class="empty-row" colspan="4">
+              Không có lịch chiếu nào.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer" *ngIf="filteredShowtimes.length > 0">
+      <div class="page-size">
+        <span>Hiển thị:</span>
+        <select [(ngModel)]="pageSize">
+          <option [ngValue]="5">5 / trang</option>
+          <option [ngValue]="10">10 / trang</option>
+          <option [ngValue]="20">20 / trang</option>
+        </select>
+      </div>
+
+      <pagination-controls (pageChange)="page = $event" previousLabel="‹" nextLabel="›">
+      </pagination-controls>
+    </div>
+  </div>
+</div>
+
+<!-- Modal tạo / cập nhật lịch chiếu -->
+<div class="modal-backdrop" *ngIf="isModalOpen">
+  <div class="schedule-modal">
+    <div class="modal-header">
+      <h3>
+        {{ isEditing ? 'Cập nhật lịch chiếu' : 'Tạo lịch chiếu' }}
+      </h3>
+      <button type="button" class="close-btn" (click)="closeModal()">
+        ×
+      </button>
+    </div>
+
+    <form [formGroup]="showtimeForm" (ngSubmit)="submitShowtime()">
+      <div class="modal-body">
+        <div class="field-group">
+          <label class="field-label">
+            Phim chiếu <span class="required">*</span>
+          </label>
+          <select class="field-input" formControlName="movieId">
+            <option value="" disabled>Chọn một phim</option>
+            <option *ngFor="let m of movies" [value]="m.id">
+              {{ m.title }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            Ngày bắt đầu <span class="required">*</span>
+          </label>
+          <input type="date" class="field-input" formControlName="startDate" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            Ngày kết thúc <span class="required">*</span>
+          </label>
+          <input type="date" class="field-input" formControlName="endDate" />
+        </div>
+
+        <!-- <div class="field-group">
+          <label class="field-label">
+            Giá cơ sở <span class="required">*</span>
+          </label>
+          <input type="number" class="field-input" formControlName="basePrice" />
+        </div> -->
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-outline" (click)="closeModal()">
+          Hủy
+        </button>
+        <button type="submit" class="btn-primary">
+          {{ isEditing ? 'Cập nhật' : 'Lưu' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

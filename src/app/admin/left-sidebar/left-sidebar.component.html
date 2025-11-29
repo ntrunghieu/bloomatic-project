@@ -32,6 +32,26 @@
                 </div>
             </div>
 
+             <!-- Nhóm: Quản lý rạp chiếu -->
+            <div class="nav-group" [class.open]="openGroupSchedule === 'theater'">
+                <button class="nav-group-header" (click)="toggleGroupSchedule('theater')">
+                    <span class="icon"><i class="fa-solid fa-city"></i></span>
+                    <span class="text">Quản lý rạp chiếu</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">               
+                    <a routerLink="/admin/cinemas/list" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'theaterList'"
+                        (click)="activeView = 'theaterList'">
+                        <span>Danh sách rạp chiếu</span>
+                    </a>
+                    <a routerLink="/admin/cinemas/create" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'theaterCreate'"
+                        (click)="activeView = 'theaterCreate'">
+                        <span>Tạo rạp chiếu</span>
+                    </a>
+                </div>
+            </div>
+
             <!-- Nhóm: Quản lý phim -->
             <div class="nav-group" [class.open]="openGroup === 'movies'">
                 <button class="nav-group-header" (click)="toggleGroup('movies')">
@@ -55,42 +75,102 @@
             <!-- Nhóm: Quản lý lịch chiếu -->
             <div class="nav-group" [class.open]="openGroupSchedule === 'schedule'">
                 <button class="nav-group-header" (click)="toggleGroupSchedule('schedule')">
-                    <span class="icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    <span class="icon"><i class="fa-solid fa-calendar"></i></span>
                     <span class="text">Quản lý lịch chiếu</span>
                     <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
                 </button>
 
                 <div class="nav-sub">
-                    <a class="nav-sub-item" [class.active]="activeView === 'scheduleList'"
+                    <a routerLink="/admin/showtimes/list" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'scheduleList'"
                         (click)="activeView = 'scheduleList'">
                         <span>Danh sách lịch chiếu</span>
                     </a>
-                    <a class="nav-sub-item" [class.active]="activeView === 'scheduleCreate'"
+                    <a hidden ="nav-sub-item" [class.active]="activeView === 'scheduleCreate'"
                         (click)="activeView = 'scheduleCreate'">
                         <span>Tạo lịch chiếu</span>
                     </a>
                 </div>
             </div>
 
+            <!-- Nhóm: Quản lý suất chiếu -->
+            <div class="nav-group" [class.open]="openGroupShowTime === 'showtime'">
+                <button class="nav-group-header" (click)="toggleGroupShowTime('showtime')">
+                    <span class="icon"><i class="fa-solid fa-calendar"></i></span>
+                    <span class="text">Quản lý suất chiếu</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a routerLink="/admin/showtimes/sessions" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'showTimeList'"
+                        (click)="activeView = 'showTimeList'">
+                        <span>Danh sách suất chiếu</span>
+                    </a>
+                    <a hidden  class="nav-sub-item" [class.active]="activeView === 'showTimeCreate'"
+                        (click)="activeView = 'showTimeCreate'">
+                        <span>Tạo suất chiếu</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Nhóm: Quản lý đơn hàng -->
+            <div class="nav-group" [class.open]="openGroupOrders === 'orders'">
+                <button class="nav-group-header" (click)="toggleGroupOrders('orders')">
+                    <span class="icon"><i class="fa-solid fa-calendar"></i></span>
+                    <span class="text">Quản lý đơn hàng</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a routerLink="/admin/orders" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'ordersList'"
+                        (click)="activeView = 'orders'">
+                        <span>Danh sách đơn hàng</span>
+                    </a>
+                    <!-- <a hidden  class="nav-sub-item" [class.active]="activeView === 'ordersCreate'"
+                        (click)="activeView = 'ordersCreate'">
+                        <span>Tạo suất chiếu</span>
+                    </a> -->
+                </div>
+            </div>
+
+            <!-- Nhóm: Quản lý vé -->
+            <div class="nav-group" [class.open]="openGroupTicket === 'ticket'">
+                <button class="nav-group-header" (click)="toggleGroupTicket('ticket')">
+                    <span class="icon"><i class="fa-solid fa-calendar"></i></span>
+                    <span class="text">Quản lý vé</span>
+                    <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                </button>
+
+                <div class="nav-sub">
+                    <a class="nav-sub-item" [class.active]="activeView === 'ticketList'"
+                        (click)="activeView = 'ticketList'">
+                        <span>Danh sách vé</span>
+                    </a>
+                    <a class="nav-sub-item" [class.active]="activeView === 'ticketCreate'"
+                        (click)="activeView = 'ticketCreate'">
+                        <span>Tạo vé</span>
+                    </a>
+                </div>
+            </div>
+
             <!-- Nhóm: Quản lý rạp chiếu -->
-            <div class="nav-group" [class.open]="openGroupSchedule === 'theater'">
+            <!-- <div class="nav-group" [class.open]="openGroupSchedule === 'theater'">
                 <button class="nav-group-header" (click)="toggleGroupSchedule('theater')">
-                    <span class="icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    <span class="icon"><i class="fa-solid fa-city"></i></span>
                     <span class="text">Quản lý rạp chiếu</span>
                     <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
                 </button>
 
                 <div class="nav-sub">               
-                    <a class="nav-sub-item" [class.active]="activeView === 'theaterList'"
+                    <a routerLink="/admin/cinemas/list" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'theaterList'"
                         (click)="activeView = 'theaterList'">
                         <span>Danh sách rạp chiếu</span>
                     </a>
-                    <a class="nav-sub-item" [class.active]="activeView === 'theaterCreate'"
+                    <a routerLink="/admin/cinemas/create" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'theaterCreate'"
                         (click)="activeView = 'theaterCreate'">
                         <span>Tạo rạp chiếu</span>
                     </a>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Nhóm: Khác -->
             <div class="nav-group" [class.open]="openGroup === 'others'">

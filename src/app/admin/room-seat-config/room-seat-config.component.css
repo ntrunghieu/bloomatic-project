@@ -1,0 +1,213 @@
+.seat-config-page {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px 18px;
+}
+
+.left-panel {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 14px 16px;
+  font-size: 13px;
+}
+
+.left-panel h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.value {
+  font-weight: 600;
+}
+
+.legend {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 8px;
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seat-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+.seat-icon.standard {
+  background: #a855f7;
+}
+
+.seat-icon.vip {
+  background: #f9738e;
+}
+
+.seat-icon.couple {
+  background: yellow;
+}
+
+.seat-icon.block {
+  background: #9ca3af;
+}
+
+.type-buttons {
+  margin: 10px 0 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.type-buttons button {
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 4px 10px;
+  background: #f9fafb;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.type-buttons button.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+/* Right panel */
+.right-panel {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 14px 16px 18px;
+}
+
+.screen-label {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #6b7280;
+  border-bottom: 2px solid #9ca3af;
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+}
+
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: auto;
+  user-select: none;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.row-label {
+  width: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.seat-cell {
+  width: 32px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ghế couple ô chính: rộng bằng 2 ghế + khoảng cách */
+.seat-cell.couple-main {
+  width: 68px;
+  /* 2 * 32 + 2 * (khoảng gap) – bạn có thể chỉnh lại */
+}
+
+/* ghế couple ô phụ: ẩn nhưng vẫn chiếm "slot" trong flex để không bị lệch grid */
+.seat-cell.couple-ghost {
+  width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
+
+/* màu theo type */
+.seat-cell.standard {
+  background: #a855f7;
+  border-color: #bfdbfe;
+}
+
+.seat-cell.vip {
+  background: #f9738e;
+  border-color: #fecaca;
+}
+
+.seat-cell.couple {
+  background: yellow;
+  border-color: #ddd6fe;
+}
+
+.seat-cell.block {
+  background: #9ca3af;
+  color: #f9fafb;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .seat-config-page {
+    grid-template-columns: 1fr;
+  }
+}
+
+.top-actions {
+  margin-bottom: 8px;
+}
+
+.back-btn {
+  background: #f9fafb;
+  color: #111827;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background: #e5e7eb;
+}

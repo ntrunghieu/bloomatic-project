@@ -1,0 +1,325 @@
+.page-wrap {
+  padding: 16px 18px 20px;
+}
+
+/* breadcrumb giống các trang admin khác */
+.breadcrumb {
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.breadcrumb a {
+  color: #4b5563;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* TOP GRID: form + map */
+.top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.6fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.cinema-card,
+.map-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 14px 16px 16px;
+  font-size: 13px;
+}
+
+/* header nút Quay lại / Cập nhật / Xóa */
+.cinema-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.btn-group-left,
+.btn-group-right {
+  display: flex;
+  gap: 8px;
+}
+
+/* buttons dùng style gần giống bạn đang dùng trong room-list */ 
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border-radius: 4px;
+  border: none;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline {
+  background: #f9fafb;
+  color: #111827;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 4px;
+  border: 1px solid #fecaca;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* fields */
+.field-group {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.field-input,
+.field-textarea {
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  font-size: 13px;
+  outline: none;
+}
+
+.field-input:focus,
+.field-textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+.field-textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.required {
+  color: #ef4444;
+}
+
+/* MAP CARD */
+.map-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.map-address {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.map-frame {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  height: 260px;
+}
+
+.map-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.map-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ROOMS SECTION (dùng style gần với room-list hiện tại) */ 
+.rooms-section {
+  margin-top: 4px;
+}
+
+.rooms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.rooms-header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.rooms-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 10px 12px 14px;
+}
+
+.rooms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rooms-table th,
+.rooms-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rooms-table th {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: left;
+}
+
+.empty-row {
+  text-align: center;
+  color: #9ca3af;
+}
+
+/* tags loại phòng */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  border: 1px solid transparent;
+}
+
+/* Phòng tiêu chuẩn */
+.tag-standard {
+  background: #e5f0ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+/* GOLD CLASS */
+.tag-gold {
+  background: #fef3c7;
+  border-color: #facc15;
+  color: #92400e;
+}
+
+/* IMAX */
+.tag-imax {
+  background: #dcfce7;
+  border-color: #4ade80;
+  color: #166534;
+}
+
+
+/* action buttons */
+.actions-col {
+  text-align: right;
+}
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+}
+
+.action-btn.primary {
+  background: #e0f2fe;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
+.action-btn.danger {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+/* MODAL tạo phòng chiếu – tái dùng style từ room-list của bạn :contentReference[oaicite:2]{index=2} */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.room-modal {
+  width: min(480px, 100vw - 32px);
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+  padding: 16px 20px 14px;
+  font-size: 13px;
+}
+
+.room-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.room-modal__header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.room-modal__close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.room-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.room-modal__footer {
+  margin-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+@media (max-width: 992px) {
+  .top-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,60 @@
+h2 {
+    margin: 0 0 14px
+}
+
+.cover {
+    height: 140px;
+    background: url('/assets/cover-cinema.jpg') center/cover no-repeat;
+    border-radius: 10px;
+    position: relative;
+    margin-bottom: 18px
+}
+
+.avatar {
+    position: absolute;
+    left: 24px;
+    bottom: -24px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: grid;
+    place-items: center;
+    font-weight: 700
+}
+
+.form {
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+    max-width: 520px
+}
+
+input {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px
+}
+
+.primary {
+    margin-top: 6px;
+    background: #e20074;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    height: 40px;
+    padding: 0 16px;
+    cursor: pointer
+}
+
+.primary:disabled {
+    opacity: .6;
+    cursor: not-allowed
+}
+
+.msg {
+    margin-left: 8px;
+    color: #16a34a;
+    font-weight: 600
+}

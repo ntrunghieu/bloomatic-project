@@ -1,0 +1,63 @@
+ h2 {
+     margin: 0 0 14px
+ }
+
+ .table-wrap {
+     border: 1px solid #eee;
+     border-radius: 12px;
+     overflow: hidden
+ }
+
+ .tbl {
+     width: 100%;
+     border-collapse: collapse;
+     background: #fff
+ }
+
+ .tbl thead th {
+     background: #f8fafc;
+     text-align: left;
+     padding: 12px;
+     font-weight: 700;
+     border-bottom: 1px solid #eee
+ }
+
+ .tbl td {
+     padding: 12px;
+     border-bottom: 1px solid #f3f4f6
+ }
+
+ .right {
+     text-align: right
+ }
+
+ .pager {
+     display: flex;
+     gap: 8px;
+     align-items: center;
+     justify-content: flex-end;
+     padding: 12px;
+     background: #fff
+ }
+
+ .pager button {
+     height: 34px;
+     padding: 0 10px;
+     border-radius: 8px;
+     border: 1px solid #e5e7eb;
+     background: #fff;
+     cursor: pointer
+ }
+
+ .pager button:disabled {
+     opacity: .5;
+     cursor: not-allowed
+ }
+
+ .pager select {
+     height: 34px;
+     border-radius: 8px;
+     border: 1px solid #e5e7eb;
+     padding: 0 8px;
+     background: #fff
+ }

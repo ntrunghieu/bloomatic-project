@@ -1,0 +1,245 @@
+<div class="page-wrap" *ngIf="order; else notFound">
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <a routerLink="/admin/orders">Danh sách đơn hàng</a>
+      <span>/</span>
+      <span>Đơn hàng {{ order.code }}</span>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-outline" routerLink="/admin/orders">
+        <i class="fa-solid fa-arrow-left"></i>
+        Quay lại
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'info'" (click)="setTab('info')">
+      Thông tin đơn hàng
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'tickets'" (click)="setTab('tickets')">
+      Vé &amp; QR ({{ order.tickets.length }})
+    </button>
+  </div>
+
+  <div class="card">
+    <!-- TAB 1: THÔNG TIN ĐƠN HÀNG -->
+    <ng-container *ngIf="activeTab === 'info'">
+      <div class="detail-grid">
+        <!-- THÔNG TIN ĐƠN HÀNG -->
+        <div class="detail-section">
+          <h3>Thông tin đơn hàng</h3>
+          <div class="detail-row">
+            <span class="label">Mã đơn hàng:</span>
+            <span class="value">{{ order.code }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Phim:</span>
+            <span class="value link-text">{{ order.movieTitle }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Giờ chiếu:</span>
+            <span class="value">
+              <span class="time-chip">{{ order.showTimeRange }}</span>
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Ngày chiếu:</span>
+            <span class="value">{{ order.showDate }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Phòng chiếu:</span>
+            <span class="value">{{ order.roomName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Rạp chiếu:</span>
+            <span class="value link-text">{{ order.cinemaName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Ngày đặt:</span>
+            <span class="value">{{ order.bookedDate }}</span>
+          </div>
+        </div>
+
+        <!-- THÔNG TIN KHÁCH HÀNG -->
+        <div class="detail-section">
+          <h3>Thông tin khách hàng</h3>
+          <div class="detail-row">
+            <span class="label">Khách hàng:</span>
+            <span class="value link-text">{{ order.customerName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Điện thoại:</span>
+            <span class="value">{{ order.customerPhone }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ order.customerEmail }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Trạng thái:</span>
+            <span class="value">
+              <span class="status-pill" [ngClass]="statusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Thành tiền:</span>
+            <span class="value">
+              {{ formatCurrency(order.amount) }}đ
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Giảm giá:</span>
+            <span class="value">
+              {{ formatCurrency(order.discount) }}đ
+            </span>
+          </div>
+          <div class="detail-row total-row">
+            <span class="label">Tổng tiền:</span>
+            <span class="value strong">
+              {{ formatCurrency(order.total) }}đ
+            </span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- TAB 2: VÉ & QR -->
+    <ng-container *ngIf="activeTab === 'tickets'">
+      <div class="tickets-section">
+        <h3>Danh sách vé ({{ order.tickets.length }})</h3>
+
+        <div class="table-wrap">
+          <table class="tickets-table">
+            <thead>
+              <tr>
+                <th>Mã vé</th>
+                <th>Ghế</th>
+                <th>Trạng thái</th>
+                <th>Giá vé</th>
+                <th>Phát hành</th>
+                <th>Sử dụng</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of order.tickets">
+                <td>{{ t.code }}</td>
+                <td>
+                  <div class="seat-cell">
+                    <span class="seat-label">{{ t.seatLabel }}</span>
+                    <span class="seat-type">{{ t.seatType }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="ticket-status" [ngClass]="ticketStatusClass(t.status)">
+                    {{ t.status }}
+                  </span>
+                </td>
+                <td>
+                  {{ formatCurrency(t.finalPrice) }} đ
+                </td>
+                <td>{{ formatDateTime(t.issueTime) }}</td>
+                <td>{{ formatDateTime(t.usedTime || null) }}</td>
+                <td class="actions-cell">
+                  <button type="button" class="btn-link" (click)="openTicketModal(t)">
+                    Xem QR
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="order.tickets.length === 0">
+                <td colspan="7" class="empty-row">
+                  Đơn hàng này chưa phát hành vé.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="hint-text">
+          *Lưu ý: QR hiển thị ở đây chỉ để tra cứu. Khi triển khai thật, nên
+          xác thực chữ ký (chu_ky) và tránh cho phép tải QR ra ngoài nếu không cần thiết.
+        </p>
+      </div>
+    </ng-container>
+  </div>
+
+
+<!-- MODAL XEM QR -->
+<div class="qr-modal-backdrop" *ngIf="selectedTicket as ticket">
+  <div class="qr-modal">
+    <div class="qr-modal-header">
+      <h3>Vé {{ ticket.code }}</h3>
+      <button type="button" class="qr-close-btn" (click)="closeTicketModal()">
+        ×
+      </button>
+    </div>
+
+    <div class="qr-modal-body">
+      <div class="qr-box">
+        <div class="qr-placeholder">
+          QR CODE
+        </div>
+      </div>
+
+      <div class="ticket-info">
+        <div class="info-row">
+          <span class="label">Mã vé:</span>
+          <span class="value">{{ ticket.code }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ghế:</span>
+          <span class="value">
+            {{ ticket.seatLabel }} ({{ ticket.seatType }})
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Giá vé:</span>
+          <span class="value">
+            {{ formatCurrency(ticket.finalPrice) }}đ
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Trạng thái:</span>
+          <span class="value">
+            <span
+              class="ticket-status"
+              [ngClass]="ticketStatusClass(ticket.status)"
+            >
+              {{ ticket.status }}
+            </span>
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Payload QR:</span>
+          <span class="value code-block">
+            {{ ticket.qrPayload }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="qr-modal-footer">
+      <button type="button" class="btn btn-outline" (click)="closeTicketModal()">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<ng-template #notFound>
+  <div class="page-wrap">
+    <div class="card">
+      Không tìm thấy đơn hàng.
+      <button class="btn btn-outline" routerLink="/admin/orders">Quay lại</button>
+    </div>
+  </div>
+</ng-template>

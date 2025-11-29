@@ -1,0 +1,356 @@
+.account-page {
+  background: #f3f4f6;
+  min-height: calc(100vh - 80px); /* trừ header/footer nếu có */
+  padding: 24px 16px 40px;
+}
+
+.account-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* breadcrumb */
+.breadcrumb {
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.breadcrumb a {
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* layout 2 cột */
+.account-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+}
+
+/* sidebar */
+.account-sidebar {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 0;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.sidebar-section + .sidebar-section {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.sidebar-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-item:hover {
+  background: #f9fafb;
+}
+
+.sidebar-item.active {
+  background: #fee2e2;
+  color: #be123c;
+}
+
+/* content */
+.account-content {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 18px 20px 22px;
+}
+
+.content-header h1 {
+  font-size: 18px;
+  margin: 0 0 14px;
+}
+
+/* table */
+.history-card {
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.history-table thead {
+  background: #f9fafb;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.history-table th {
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 12px;
+}
+
+.history-table .movie-cell {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amount-col {
+  text-align: right;
+}
+
+.action-col {
+  text-align: right;
+  width: 110px;
+}
+
+/* link button */
+.link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 18px 10px;
+  color: #9ca3af;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .account-content {
+    padding-inline: 14px;
+  }
+
+  .history-table th,
+  .history-table td {
+    padding-inline: 10px;
+  }
+}
+
+/* ========== Modal chi tiết vé (mobile ticket) ========== */
+
+.ticket-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+}
+
+.ticket-detail-card {
+  width: min(420px, 100vw - 24px);
+  max-height: calc(100vh - 40px);
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.td-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* header */
+.td-header {
+  display: flex;
+  padding: 14px 16px 10px;
+  gap: 10px;
+}
+
+.td-poster img {
+  width: 64px;
+  height: 96px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.td-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.td-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.td-sub {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.td-sub.small {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.td-tag {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 11px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* swipe bar */
+.td-swipe-bar {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 0 8px;
+  text-align: center;
+  font-size: 11px;
+  color: #6b7280;
+  position: relative;
+}
+
+.td-swipe-bar .handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  margin: 0 auto 4px;
+}
+
+/* body */
+.td-body {
+  padding: 10px 16px 12px;
+  text-align: center;
+}
+
+.td-ticket-count {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.td-screen {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.td-seat {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.td-qr-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 6px;
+}
+
+.td-booking-id {
+  font-size: 11px;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+.td-booking-id span {
+  font-weight: 600;
+}
+
+.td-note {
+  font-size: 11px;
+  color: #9ca3af;
+  padding: 6px 8px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.td-support {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #2563eb;
+}
+
+.support-icon {
+  font-size: 14px;
+}
+
+/* footer: breakdown giá */
+.td-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 10px 16px 12px;
+  font-size: 12px;
+}
+
+.td-footer-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.td-footer-row.total {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.td-footer-row span:last-child {
+  font-weight: 500;
+}
+

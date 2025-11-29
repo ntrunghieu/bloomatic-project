@@ -1,7 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 
 type MiniMovie = {
   id: number;
@@ -19,19 +20,20 @@ type MiniMovie = {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent {
- // state
+export class HeaderComponent implements OnInit {
+  [x: string]: any;
+  // state
   searchOpen = false;
   q = '';
   recent = ['Nhà Gia Tiên'];
-   // state modal auth
+  // state modal auth
   authModalOpen = false;
   authMode: 'login' | 'register' = 'login';
 
-  loginModel = {
-    email: '',
-    password: '',
-  };
+  // loginModel = {
+  //   email: '',
+  //   password: '',
+  // };
 
   registerModel = {
     fullName: '',
@@ -48,11 +50,29 @@ export class HeaderComponent {
     { id: 4, title: 'Tee Yod: Quỷ Ăn Tạng 3', poster: 'https://picsum.photos/80/110?4', genres: 'Kinh Dị, Hành Động', rating: 7.9, nowPlaying: true },
   ];
 
+  err = '';
+  loginModel!: FormGroup;
+
+  user: any = null;          // dữ liệu user sau đăng nhập
+  menuOpen = false;
+
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) { }
+  ngOnInit(): void {
+    this.loginModel = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]]
+    });
+
+    this.auth.currentUser$?.subscribe(u => {
+      this.user = u;
+    });
+  }
+
   // ===== Search =====
   toggleSearch() { this.searchOpen = !this.searchOpen; }
   closeSearch() { this.searchOpen = false; }
 
-   // ===== Auth modal =====
+  // ===== Auth modal =====
   openLogin() {
     this.authMode = 'login';
     this.authModalOpen = true;
@@ -88,8 +108,35 @@ export class HeaderComponent {
 
   submitLogin() {
     // TODO: gọi API đăng nhập
-    console.log('LOGIN', this.loginModel);
-    this.closeAuth();
+    // console.log('LOGIN', this.loginModel);
+    // this.closeAuth();
+    if (this.loginModel.invalid) return;
+    this.err = '';
+    this.auth.login(this.loginModel.value as any).subscribe({
+      next: () => {
+        this.authModalOpen = false;     // đóng modal
+        this.menuOpen = false;
+        this.router.navigateByUrl('/')
+      },
+      error: (e) => this.err = e?.error?.message || 'Đăng nhập thất bại'
+    });
+    this.authModalOpen = true;
+  }
+
+  toggleMenu() { this.menuOpen = !this.menuOpen; }
+  closeMenu() { this.menuOpen = false; }
+
+  logout() {
+    this.auth.logout();
+    this.menuOpen = false;
+    this.router.navigateByUrl('/');
+  }
+
+  // Đóng dropdown khi bấm ra ngoài
+  @HostListener('document:click', ['$event'])
+  onDocClick(ev: MouseEvent) {
+    const t = ev.target as HTMLElement;
+    if (!t.closest('.user-menu')) this.menuOpen = false;
   }
 
   submitRegister() {

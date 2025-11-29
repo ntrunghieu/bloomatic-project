@@ -289,7 +289,7 @@
 
 .auth-btn.outline {
     border-color: #e5e7eb;
-    background: #fff;
+    background: #ffc107;
     color: #111827;
 }
 
@@ -527,4 +527,86 @@
   .auth-form-grid-2 {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* header.component.css – thêm cuối file */
+
+/* ========== USER CHIP & DROPDOWN ========== */
+.user-menu {
+  position: relative;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.user-chip:hover {
+  background: #f9fafb;
+}
+
+.user-chip .avatar {
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e5e7eb;
+  font-size: 12px;
+}
+
+.user-chip .name {
+  max-width: 160px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.user-chip .caret {
+  transition: transform .18s ease;
+  font-size: 12px;
+  color: #6b7280;
+}
+.user-chip .caret.open { transform: rotate(180deg); }
+
+/* dropdown */
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(-4px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.2);
+  padding: 6px;
+  animation: fadeSlide .16s ease-out;
+  z-index: 80;
+}
+
+.dropdown .item {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #111;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.dropdown .item:hover {
+  background: #f8fafc;
+  color: #e20074;
 }

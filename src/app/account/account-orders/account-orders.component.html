@@ -1,0 +1,38 @@
+<h2>Lịch sử mua vé</h2>
+
+  <div class="table-wrap" *ngIf="page">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Ngày giao dịch</th>
+          <th>Mã đơn hàng</th>
+          <th>Tên phim</th>
+          <th class="right">Số tiền</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of page.content">
+          <td>{{ r.paidAt | date:'dd/MM/yyyy' }}</td>
+          <td>{{ r.orderCode }}</td>
+          <td>{{ r.movieTitle }}</td>
+          <td class="right">{{ r.totalAmount | currency:'VND':'symbol':'1.0-0' }}</td>
+          <td><a [routerLink]="['/orders', r.id]">Xem chi tiết</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pager">
+      <button (click)="go(0)" [disabled]="page.page===0">« Đầu</button>
+      <button (click)="go(page.page-1)" [disabled]="page.page===0">‹ Trước</button>
+
+      <span>Trang {{page.page+1}} / {{page.totalPages}}</span>
+
+      <button (click)="go(page.page+1)" [disabled]="page.page>=page.totalPages-1">Sau ›</button>
+      <button (click)="go(page.totalPages-1)" [disabled]="page.page>=page.totalPages-1">Cuối »</button>
+
+      <select [value]="size" (change)="changeSize($event)">
+        <option *ngFor="let s of [5,10,20,50]" [value]="s">{{s}} / trang</option>
+      </select>
+    </div>
+  </div>

@@ -1,0 +1,271 @@
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <span>Dashboard</span>
+      <span>/</span>
+      <span>Danh sách suất chiếu</span>
+    </div>
+  </div>
+
+  <!-- BỘ LỌC -->
+  <div class="filter-bar card">
+    <div class="filter-row">
+      <div class="filter-item">
+        <label>Rạp chiếu:</label>
+        <select [(ngModel)]="selectedCinemaId" (change)="applyFilters()">
+          <option value="">Chọn rạp chiếu</option>
+          <option *ngFor="let c of cinemas" [value]="c.id">
+            {{ c.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Phòng chiếu:</label>
+        <select [(ngModel)]="selectedRoomId" (change)="applyFilters()">
+          <option value="">Chọn phòng chiếu</option>
+          <option *ngFor="let r of filteredRooms" [value]="r.id">
+            {{ r.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Ngày chiếu:</label>
+        <input type="date" [(ngModel)]="selectedDate" (change)="applyFilters()" />
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn-primary" type="button" (click)="applyFilters()">
+          Tìm kiếm
+        </button>
+        <button class="btn-outline" type="button" (click)="refresh()">
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-summary" *ngIf="currentCinema && currentRoom">
+      <div class="summary-date">
+        Lịch chiếu ngày:
+        <strong>{{ selectedDate | date : 'dd-MM-yyyy' }}</strong>
+      </div>
+      <div class="summary-cinema">
+        Rạp:
+        <span class="cinema-chip">
+          {{ currentCinema?.name }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DANH SÁCH SUẤT CHIẾU -->
+  <div class="card" *ngIf="currentCinema && currentRoom; else noRoom">
+    <div class="room-title">
+      {{ currentRoom?.name }}
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Phim chiếu</th>
+            <th>Định dạng</th>
+            <th>Hình thức dịch</th>
+            <th>Thời gian chiếu</th>
+            <th>Giá cơ sở</th>
+            <!-- <th>Loại suất chiếu</th> -->
+            <th>Trạng thái</th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="
+              let s of filteredSlots
+                | paginate: { itemsPerPage: pageSize, currentPage: page }
+            ">
+            <td>
+              <div class="movie-cell">
+                <a href="javascript:void(0)" class="movie-link">
+                  {{ getMovieTitle(s.movieId) }}
+                </a>
+                <span class="movie-status" *ngIf="getMovieStatus(s.movieId)">
+                  {{ getMovieStatus(s.movieId) }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="tag tag-format">{{ s.format }}</span>
+            </td>
+            <td>
+              <span class="tag tag-lang">{{ s.language }}</span>
+            </td>
+            <td>
+              <span class="time-chip">
+                {{ s.startTime }} ~ {{ s.endTime }}
+              </span>
+            </td>
+            <td>
+              <!-- <span class="badge" [ngClass]="slotTypeClass(s.slotType)">
+                {{ s.slotType }}
+              </span> -->
+              <span class="badge" >
+                {{ s.basePrice | currency:'VND':'symbol':'1.0-0':'vi-VN'}}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="slotStatusClass(getSlotStatus(s))">
+                {{ getSlotStatus(s) }}
+              </span>
+            </td>
+            <td class="actions">
+              <button type="button" class="icon-btn edit" title="Chỉnh sửa" (click)="openEditModal(s)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="icon-btn delete" title="Xoá" (click)="deleteSlot(s)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredSlots.length === 0">
+            <td colspan="7" class="empty-row">
+              Không có suất chiếu nào cho bộ lọc hiện tại.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer" *ngIf="filteredSlots.length > 0">
+      <!-- <div class="left-footer">
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="openCreateModal()"
+        >
+          + Thêm lịch chiếu
+        </button>
+      </div> -->
+
+      <div class="right-footer">
+        <div class="page-size">
+          <span>Hiển thị</span>
+          <select [(ngModel)]="pageSize">
+            <option [ngValue]="5">5 / trang</option>
+            <option [ngValue]="10">10 / trang</option>
+            <option [ngValue]="20">20 / trang</option>
+          </select>
+        </div>
+
+        <pagination-controls (pageChange)="page = $event" previousLabel="‹" nextLabel="›">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+  <div class="left-footer">
+    <button class="btn-primary" type="button" (click)="openCreateModal()">
+      + Thêm suất chiếu
+    </button>
+  </div>
+
+  <ng-template #noRoom>
+    <div class="card empty-state">
+      Vui lòng chọn Rạp chiếu, Phòng chiếu và Ngày chiếu để xem danh sách suất
+      chiếu.
+    </div>
+  </ng-template>
+</div>
+
+<!-- MODAL TẠO / CẬP NHẬT SUẤT CHIẾU -->
+<div class="modal-backdrop" *ngIf="isModalOpen">
+  <div class="slot-modal">
+    <div class="modal-header">
+      <h3>
+        {{ isEditing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu' }}
+        <span class="modal-subtitle" *ngIf="currentCinema && currentRoom">
+          ({{ currentCinema?.name }} - {{ currentRoom?.name }})
+        </span>
+      </h3>
+      <button class="close-btn" type="button" (click)="closeModal()">×</button>
+    </div>
+
+    <form [formGroup]="slotForm" (ngSubmit)="submitSlot()">
+      <div class="modal-body">
+        <div class="field-group">
+          <label class="field-label">
+            Phim chiếu <span class="required">*</span>
+          </label>
+          <select class="field-input" formControlName="movieId">
+            <option value="" disabled>Chọn một phim</option>
+            <option *ngFor="let m of movies" [value]="m.id">
+              {{ m.title }}
+              <ng-container *ngIf="m.status">
+                – {{ m.status }}
+              </ng-container>
+            </option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            Ngày chiếu
+          </label>
+          <input type="date" class="field-input" [value]="selectedDate" disabled />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Hình thức chiếu</label>
+          <select class="field-input" formControlName="format">
+            <option value="2D">2D</option>
+            <option value="3D">3D</option>
+            <option value="IMAX">IMAX</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Hình thức dịch</label>
+          <select class="field-input" formControlName="language">
+            <option value="Phụ đề">Phụ đề</option>
+            <option value="Thuyết minh">Thuyết minh</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">
+              Thời gian bắt đầu <span class="required">*</span>
+            </label>
+            <input type="time" class="field-input" formControlName="startTime" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              Thời gian kết thúc <span class="required">*</span>
+            </label>
+            <!-- <input type="time" class="field-input" formControlName="endTime" /> -->
+            <input type="time" class="field-input" formControlName="endTime" readonly />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Giá cơ sở</label>
+          <input type="number" class="field-input" formControlName="basePrice" />
+          <!-- <select class="field-input" formControlName="slotType">
+            <option value="Theo lịch">Theo lịch</option>
+            <option value="Suất đặc biệt">Suất đặc biệt</option>
+          </select> -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-outline" (click)="closeModal()">
+          Hủy
+        </button>
+        <button type="submit" class="btn-primary">
+          {{ isEditing ? 'Cập nhật' : 'Tạo suất chiếu' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

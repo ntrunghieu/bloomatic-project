@@ -17,14 +17,14 @@
   color: #e5e7eb;
   display: flex;
   flex-direction: column;
-  padding: 16px 12px;
+  padding: 5px 12px;
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 10px 16px;
+  padding: 8px 10px 1px;
 }
 
 .logo-circle {

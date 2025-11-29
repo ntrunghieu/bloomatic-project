@@ -170,6 +170,16 @@
   color: #111827;
 }
 
+.movie-name .movie-link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.movie-name .movie-link:hover {
+  text-decoration: underline;
+}
+
+
 /* ===== BADGES ===== */
 
 .badge {

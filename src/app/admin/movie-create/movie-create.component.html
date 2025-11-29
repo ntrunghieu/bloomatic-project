@@ -5,7 +5,9 @@
         <span class="slash">/</span>
         <span>Danh sách phim</span>
         <span class="slash">/</span>
-        <span class="current">Tạo phim</span>
+        <span class="current">
+            {{ isEditMode ? 'Cập nhật phim' : 'Tạo phim' }}
+        </span>
     </div>
 
     <!-- Nút trên cùng -->
@@ -14,7 +16,8 @@
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </button>
         <button class="btn btn-primary" (click)="onSubmit()">
-            <i class="fa-solid fa-plus"></i> Tạo phim
+            <i class="fa-solid" [ngClass]="isEditMode ? 'fa-save' : 'fa-plus'"></i>
+            {{ isEditMode ? 'Cập nhật' : 'Tạo phim' }}
         </button>
     </div>
 
@@ -26,7 +29,7 @@
                 <div class="form-column">
                     <div class="form-field">
                         <label>
-                            Tên phim <span class="required">*</span>
+                            Tên phim <span class="required"> *</span>
                         </label>
                         <input type="text" formControlName="name" placeholder="Enter name">
                     </div>
@@ -59,16 +62,18 @@
 
                     <div class="form-field">
                         <label>Đạo diễn</label>
-                        <ng-select formControlName="directors" [items]="directors" [multiple]="true"
+                        <input type="text" formControlName="directors" placeholder="Enter name">
+                        <!-- <ng-select formControlName="directors" [items]="directors" [multiple]="true"
                             [closeOnSelect]="false" [searchable]="false" placeholder="Chọn đạo diễn">
-                        </ng-select>
+                        </ng-select> -->
                     </div>
 
                     <div class="form-field">
                         <label>Diễn viên</label>
-                        <ng-select formControlName="actors" [items]="actors" [multiple]="true" [closeOnSelect]="false"
+                        <input type="text" formControlName="actors" placeholder="Enter name">
+                        <!-- <ng-select formControlName="actors" [items]="actors" [multiple]="true" [closeOnSelect]="false"
                             [searchable]="false" placeholder="Chọn diễn viên">
-                        </ng-select>
+                        </ng-select> -->
                     </div>
                 </div>
 
@@ -79,7 +84,7 @@
                             Hình thức chiếu <span class="required">*</span>
                         </label>
                         <select formControlName="screenType">
-                            <option value="">Select a graphics</option>
+                            <option value="">Chọn</option>
                             <option *ngFor="let s of screenTypes" [value]="s">{{ s }}</option>
                         </select>
                     </div>
@@ -87,7 +92,7 @@
                     <div class="form-field">
                         <label>Hình thức dịch</label>
                         <select formControlName="translationType">
-                            <option value="">Select a graphics</option>
+                            <option value="">Chọn</option>
                             <option *ngFor="let t of translationTypes" [value]="t">{{ t }}</option>
                         </select>
                     </div>
@@ -125,7 +130,7 @@
                     <div class="form-field">
                         <label>Quốc gia</label>
                         <select formControlName="country">
-                            <option value="">Select a country</option>
+                            <option value="">Chọn quốc gia</option>
                             <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
                         </select>
                     </div>
@@ -143,7 +148,7 @@
                                 </div>
                             </ng-template>
 
-                            <label class="btn btn-primary btn-sm poster-btn">
+                            <label style="color: white;" class="btn btn-primary btn-sm poster-btn">
                                 Thay đổi ảnh phim
                                 <input type="file" accept="image/*" (change)="onPosterChange($event)" hidden>
                             </label>
