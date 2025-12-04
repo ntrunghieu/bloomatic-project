@@ -1,6 +1,6 @@
 // src/app/admin/showtime-session-list/showtime-session-list.component.ts
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   FormBuilder,
@@ -9,40 +9,44 @@ import {
   Validators,
 } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ShowtimeService } from '../../services/showtime/showtime.service';
+import { ShowtimeSessionService } from '../../services/showtime/showtime-session.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
-interface Cinema {
+interface Rap {
   id: number;
-  name: string;
+  tenRap: string;
 }
 
-interface Room {
+interface Phong {
   id: number;
-  cinemaId: number;
-  name: string;
+  maRap: number;
+  tenPhong: string;
 }
 
-interface Movie {
+interface Phim {
   id: number;
-  title: string;
-  status: 'Đang chiếu' | 'Sắp chiếu' | 'Đã chiếu';
-  duration: number;
+  tenPhim: string;
+  trangThai: 'Đang chiếu' | 'Sắp chiếu' | 'Đã chiếu';
+  thoiLuong: number;
 }
 
 type SlotType = 'Theo lịch' | 'Suất đặc biệt';
-type SlotStatus = 'Đang chiếu' | 'Sắp chiếu' | 'Đã chiếu';
+type TrangThai = 'Đang chiếu' | 'Sắp chiếu' | 'Đã chiếu';
 
-interface ScreeningSlot {
+interface SuatChieu {
   id: number;
-  cinemaId: number;
-  roomId: number;
-  movieId: number;
-  showDate: string;   // yyyy-MM-dd
-  format: string;     // 2D, 3D, IMAX...
-  language: string;   // Phụ đề, Thuyết minh...
-  startTime: string;  // HH:mm
-  endTime: string;    // HH:mm
-  slotType: SlotType;
-  basePrice: number;
+  maRap: number;
+  maPhong: number;
+  maPhim: number;
+  ngayBatDau: string;
+  ngayKetThuc: string;
+  dinhDang: string;     // 2D, 3D, IMAX...
+  hinhThucDich: string;   // Phụ đề, Thuyết minh...
+  gioBatDau: string;  // HH:mm
+  gioKetThuc: string;    // HH:mm
+  trangThai: string;
+  giaCoSo: number;
 }
 
 @Component({
@@ -52,92 +56,12 @@ interface ScreeningSlot {
   templateUrl: './showtime-session-list.component.html',
   styleUrl: './showtime-session-list.component.css',
 })
-export class ShowtimeSessionListComponent {
-  // ==== MOCK DATA ====
-  cinemas: Cinema[] = [
-    { id: 1, name: 'HCinema Aeon Hà Đông' },
-    { id: 2, name: 'HCinema Vincom Đà Nẵng' },
-  ];
+export class ShowtimeSessionListComponent implements OnInit {
 
-  rooms: Room[] = [
-    { id: 1, cinemaId: 1, name: 'Cinema 1' },
-    { id: 2, cinemaId: 1, name: 'Cinema 2' },
-    { id: 3, cinemaId: 2, name: 'Cinema 4' },
-  ];
-
-  movies: Movie[] = [
-    {
-      id: 1, title: 'Ta Khúc Triệu Vọng', status: 'Đang chiếu',
-      duration: 120
-    },
-    {
-      id: 2, title: 'Kẻ Thứ Thần', status: 'Đang chiếu',
-      duration: 140
-    },
-    {
-      id: 3, title: 'Người "Bạn" Trong Tưởng Tượng', status: 'Sắp chiếu',
-      duration: 150
-    },
-    {
-      id: 4, title: 'Cái Giá Của Hạnh Phúc', status: 'Đã chiếu',
-      duration: 90
-    },
-  ];
-
-  slots: ScreeningSlot[] = [
-    {
-      id: 1,
-      cinemaId: 1,
-      roomId: 1,
-      movieId: 1,
-      showDate: '2025-05-16',
-      format: '2D',
-      language: 'Phụ đề',
-      startTime: '08:00',
-      endTime: '09:45',
-      slotType: 'Theo lịch',
-      basePrice: 100000,
-    },
-    {
-      id: 2,
-      cinemaId: 1,
-      roomId: 1,
-      movieId: 2,
-      showDate: '2025-05-16',
-      format: '2D',
-      language: 'Phụ đề',
-      startTime: '10:20',
-      endTime: '12:05',
-      slotType: 'Theo lịch',
-      basePrice: 100000,
-    },
-    {
-      id: 3,
-      cinemaId: 1,
-      roomId: 1,
-      movieId: 3,
-      showDate: '2025-05-16',
-      format: '2D',
-      language: 'Phụ đề',
-      startTime: '14:45',
-      endTime: '16:30',
-      slotType: 'Theo lịch',
-      basePrice: 100000,
-    },
-    {
-      id: 4,
-      cinemaId: 1,
-      roomId: 2,
-      movieId: 4,
-      showDate: '2025-05-16',
-      format: '2D',
-      language: 'Phụ đề',
-      startTime: '19:30',
-      endTime: '21:15',
-      slotType: 'Suất đặc biệt',
-      basePrice: 100000,
-    },
-  ];
+  rap: Rap[] = [];
+  phong: Phong[] = [];
+  phim: Phim[] = [];
+  suatChieu: SuatChieu[] = [];
 
   // ==== FILTER STATE ====
   selectedCinemaId: string = '';
@@ -151,30 +75,71 @@ export class ShowtimeSessionListComponent {
   // ==== MODAL ====
   isModalOpen = false;
   isEditing = false;
-  editingSlot: ScreeningSlot | null = null;
+  editingSlot: SuatChieu | null = null;
   slotForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private showtimeService: ShowtimeSessionService) {
     this.slotForm = this.fb.group({
-      movieId: ['', Validators.required],
-      format: ['2D', Validators.required],
-      language: ['Phụ đề', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
-      basePrice: ['', Validators.required],
-      // slotType: ['Theo lịch', Validators.required],
+      // Tên control phải khớp với HTML (maPhim, dinhDang, gioBatDau, ...)
+      maPhim: ['', Validators.required],
+      ngayKetThuc: ['', Validators.required], // Thêm trường mới từ HTML
+      dinhDang: ['2D', Validators.required],
+      hinhThucDich: ['Phụ đề', Validators.required],
+      gioBatDau: ['', Validators.required],
+      // Giờ kết thúc vẫn là readonly/disabled nên cần value/disabled options
+      gioKetThuc: ['', { value: '', disabled: true }],
+      giaCoSo: ['', Validators.required],
     });
 
     // mỗi khi đổi phim hoặc giờ bắt đầu thì cập nhật giờ kết thúc
-    this.slotForm.get('movieId')?.valueChanges.subscribe(() => this.updateEndTime());
-    this.slotForm.get('startTime')?.valueChanges.subscribe(() => this.updateEndTime());
+    this.slotForm.get('maPhim')?.valueChanges.subscribe(() => this.updateEndTime());
+    this.slotForm.get('gioBatDau')?.valueChanges.subscribe(() => this.updateEndTime());
   }
+
+  ngOnInit(): void {
+    // 1. Load tất cả dữ liệu rạp, phòng, phim
+    this.loadInitialData();
+
+    // 2. Load suất chiếu cho ngày hiện tại
+    // Chức năng này sẽ được gọi bên trong loadInitialData hoặc sau khi data có đủ
+  }
+
+  // ========= NEW: LOAD INITIAL DATA =========
+
+  private loadInitialData() {
+    // Sử dụng forkJoin để tải tất cả dữ liệu cùng lúc
+    this.showtimeService.loadAllInitialData()
+      .subscribe({
+        next: ([rap, phong, phim]) => {
+          this.rap = rap;
+          this.phong = phong;
+          this.phim = phim;
+
+          // Sau khi load xong data, áp dụng bộ lọc ban đầu
+          this.applyFilters();
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải dữ liệu ban đầu (Rạp, Phòng, Phim):', err);
+          // Xử lý lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
+        }
+      });
+  }
+
+  // ========= HELPERS (Cần sửa để lọc từ rooms đã load) =========
+
+  // get filteredRooms(): Phong[] {
+  //   const cid = Number(this.selectedCinemaId);
+  //   if (!cid) return [];
+
+  //   // Lọc từ mảng rooms đã được load từ API
+  //   return this.phong.filter((r) => r.maRap === cid);
+  // }
 
   // ========= HELPERS =========
 
   private getMovieDuration(movieId: number): number | null {
-    const movie = this.movies.find(m => m.id === movieId);
-    return movie ? movie.duration : null;
+    const movie = this.phim.find(m => m.id === movieId);
+    return movie ? movie.thoiLuong : null;
   }
 
   private addMinutesToTime(time: string, minutesToAdd: number): string {
@@ -194,52 +159,52 @@ export class ShowtimeSessionListComponent {
   }
 
   private updateEndTime() {
-    const movieId = Number(this.slotForm.get('movieId')?.value);
-    const startTime = this.slotForm.get('startTime')?.value as string;
+    const movieId = Number(this.slotForm.get('maPhim')?.value);
+    const startTime = this.slotForm.get('gioBatDau')?.value as string;
 
     const duration = this.getMovieDuration(movieId);
     if (!movieId || !startTime || !duration) {
       // không đủ dữ liệu thì clear endTime
-      this.slotForm.patchValue({ endTime: '' }, { emitEvent: false });
+      this.slotForm.patchValue({ gioKetThuc: '' }, { emitEvent: false });
       return;
     }
 
     const end = this.addMinutesToTime(startTime, duration);
-    this.slotForm.patchValue({ endTime: end }, { emitEvent: false });
+    this.slotForm.patchValue({ gioKetThuc: end }, { emitEvent: false });
   }
 
-  get filteredRooms(): Room[] {
+  get filteredRooms(): Phong[] {
     const cid = Number(this.selectedCinemaId);
     if (!cid) return [];
-    return this.rooms.filter((r) => r.cinemaId === cid);
+    return this.phong.filter((r) => r.maRap === cid);
   }
 
-  get currentCinema(): Cinema | undefined {
+  get currentCinema(): Rap | undefined {
     const cid = Number(this.selectedCinemaId);
-    return this.cinemas.find((c) => c.id === cid);
+    return this.rap.find((c) => c.id === cid);
   }
 
-  get currentRoom(): Room | undefined {
+  get currentRoom(): Phong | undefined {
     const rid = Number(this.selectedRoomId);
-    return this.rooms.find((r) => r.id === rid);
+    return this.phong.find((r) => r.id === rid);
   }
 
   getMovieTitle(movieId: number): string {
-    return this.movies.find((m) => m.id === movieId)?.title || '—';
+    return this.phim.find((m) => m.id === movieId)?.tenPhim || '—';
   }
 
   getMovieStatus(movieId: number): string {
-    return this.movies.find((m) => m.id === movieId)?.status || '';
+    return this.phim.find((m) => m.id === movieId)?.trangThai || '';
   }
 
-  getSlotStatus(slot: ScreeningSlot): SlotStatus {
+  getSlotStatus(slot: SuatChieu): string {
     const today = new Date().toISOString().slice(0, 10);
-    if (slot.showDate < today) return 'Đã chiếu';
-    if (slot.showDate > today) return 'Sắp chiếu';
+    if (slot.ngayBatDau < today) return 'Đã chiếu';
+    if (slot.ngayBatDau > today) return 'Sắp chiếu';
     return 'Đang chiếu';
   }
 
-  slotStatusClass(status: SlotStatus): string {
+  slotStatusClass(status: string): string {
     switch (status) {
       case 'Đang chiếu':
         return 'badge-live';
@@ -255,24 +220,52 @@ export class ShowtimeSessionListComponent {
   }
 
   // danh sách slot sau khi lọc
-  get filteredSlots(): ScreeningSlot[] {
-    let data = [...this.slots];
+  get filteredSlots(): SuatChieu[] {
+    // let data = [...this.suatChieu];
+
+    let data = Array.isArray(this.suatChieu) ? [...this.suatChieu] : [];
 
     const cid = Number(this.selectedCinemaId);
     const rid = Number(this.selectedRoomId);
     const date = this.selectedDate;
 
-    if (cid) data = data.filter((s) => s.cinemaId === cid);
-    if (rid) data = data.filter((s) => s.roomId === rid);
-    if (date) data = data.filter((s) => s.showDate === date);
+
+    if (cid) data = data.filter((s) => s.maRap === cid);
+    if (rid) data = data.filter((s) => s.maPhong === rid);
+    if (date) data = data.filter((s) => s.ngayBatDau === date);
 
     // sort theo giờ chiếu tăng dần
-    data.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    data.sort((a, b) => a.gioBatDau.localeCompare(b.gioBatDau));
     return data;
   }
 
   applyFilters() {
     this.page = 1;
+    const cid = Number(this.selectedCinemaId);
+    const rid = Number(this.selectedRoomId);
+    const date = this.selectedDate;
+
+    // Nếu thiếu rạp hoặc phòng, clear danh sách và không gọi API
+    if (!cid || !rid) {
+      this.suatChieu = [];
+      return;
+    }
+
+    // Gọi API để lấy dữ liệu thật
+    this.showtimeService.getFilteredSlots(cid, rid, date)
+      .subscribe({
+        next: (data) => {
+          console.log('suat chieu day nè')
+          console.log(data)
+          this.suatChieu = data;
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải suất chiếu:', err);
+          this.suatChieu = []; // Xử lý lỗi: xóa dữ liệu cũ
+        }
+      });
+
+
   }
 
   // ========= MODAL =========
@@ -288,39 +281,119 @@ export class ShowtimeSessionListComponent {
     this.isEditing = false;
     this.editingSlot = null;
     this.slotForm.reset({
-      movieId: '',
-      format: '2D',
-      language: 'Phụ đề',
-      startTime: '',
-      endTime: '',
-      slotType: 'Theo lịch',
+      maPhim: '',
+      dinhDang: '2D',
+      hinhThucDich: 'Phụ đề',
+      ngayBatDau: '',
+      ngayKetThuc: '',
+      gioBatDau: '',
+      gioKetThuc: '',
+      giaCoSo: '',
     });
     this.isModalOpen = true;
   }
 
-  openEditModal(slot: ScreeningSlot) {
+  // openEditModal(slot: SuatChieu) {
+  //   this.isEditing = true;
+  //   this.editingSlot = slot;
+
+  //   this.selectedCinemaId = String(slot.maRap);
+  //   this.selectedRoomId = String(slot.maPhong);
+  //   this.selectedDate = slot.ngayBatDau;
+
+  //   this.slotForm.setValue({
+  //     maPhim: slot.maPhim,
+  //     dinhDang: slot.dinhDang,
+  //     hinhThucDich: slot.hinhThucDich,
+  //     ngayBatDau: slot.ngayBatDau,
+  //     ngayKetThuc: slot.ngayKetThuc,
+  //     gioBatDau: slot.gioBatDau,
+  //     gioKetThuc: slot.gioKetThuc,
+  //     giaCoSo: slot.giaCoSo,
+  //     trangThai: slot.trangThai,
+  //   });
+
+  //   this.isModalOpen = true;
+  // }
+
+  openEditModal(slot: SuatChieu) {
+    console.log("form edit")
+    console.log(slot)
     this.isEditing = true;
     this.editingSlot = slot;
 
-    this.selectedCinemaId = String(slot.cinemaId);
-    this.selectedRoomId = String(slot.roomId);
-    this.selectedDate = slot.showDate;
 
-    this.slotForm.setValue({
-      movieId: slot.movieId,
-      format: slot.format,
-      language: slot.language,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      slotType: slot.slotType,
-    });
+    this.selectedCinemaId = String(slot.maRap);
+    this.selectedRoomId = String(slot.maPhong);
+    this.selectedDate = slot.ngayBatDau;
+
 
     this.isModalOpen = true;
+
+
+    this.slotForm.patchValue({
+      maPhim: slot.maPhim,
+      dinhDang: slot.dinhDang,
+      hinhThucDich: slot.hinhThucDich,
+      ngayBatDau: slot.ngayBatDau,
+      ngayKetThuc: slot.ngayKetThuc,
+      gioBatDau: slot.gioBatDau,
+      gioKetThuc: slot.gioKetThuc,
+      giaCoSo: slot.giaCoSo,
+      trangThai: slot.trangThai,
+    });
+
+    this.updateEndTime();
   }
 
   closeModal() {
     this.isModalOpen = false;
   }
+
+  // submitSlot() {
+  //   if (this.slotForm.invalid) {
+  //     this.slotForm.markAllAsTouched();
+  //     return;
+  //   }
+
+  //   const cid = Number(this.selectedCinemaId);
+  //   const rid = Number(this.selectedRoomId);
+  //   const date = this.selectedDate;
+  //   if (!cid || !rid || !date) {
+  //     alert('Thiếu rạp chiếu / phòng chiếu / ngày chiếu.');
+  //     return;
+  //   }
+
+  //   const value = this.slotForm.value;
+  //   // payload cố ý KHÔNG chứa id
+  //   const payload: Omit<SuatChieu, 'id'> = {
+  //     maRap: cid,
+  //     maPhong: rid,
+  //     maPhim: Number(value.movieId),
+  //     ngayBatDau: date,
+  //     dinhDang: value.format,
+  //     hinhThucDich: value.language,
+  //     gioBatDau: value.startTime,
+  //     gioKetThuc: value.endTime,
+  //     trangThai: value.slotType,
+  //     giaCoSo: Number(value.basePrice)
+  //   };
+
+  //   if (this.isEditing && this.editingSlot) {
+  //     Object.assign(this.editingSlot, payload);
+  //   } else {
+  //     const newId =
+  //       this.suatChieu.length > 0
+  //         ? Math.max(...this.suatChieu.map((s) => s.id)) + 1
+  //         : 1;
+
+  //     this.suatChieu.push({
+  //       id: newId,
+  //       ...payload,
+  //     });
+  //   }
+  //   this.isModalOpen = false;
+  // }
 
   submitSlot() {
     if (this.slotForm.invalid) {
@@ -336,42 +409,70 @@ export class ShowtimeSessionListComponent {
       return;
     }
 
-    const value = this.slotForm.value;
-    // payload cố ý KHÔNG chứa id
-    const payload: Omit<ScreeningSlot, 'id'> = {
-      cinemaId: cid,
-      roomId: rid,
-      movieId: Number(value.movieId),
-      showDate: date,
-      format: value.format,
-      language: value.language,
-      startTime: value.startTime,
-      endTime: value.endTime,
-      slotType: value.slotType,
-      basePrice: Number(value.basePrice)
+    // Dùng getRawValue() để lấy giá trị của trường endTime (vì nó là readonly/disabled)
+    const value = this.slotForm.getRawValue();
+
+    // Payload cần ánh xạ tới SuatChieuDto của BE
+    const payload: Omit<SuatChieu, 'id'> = {
+    maRap: cid,
+    maPhong: rid,
+    maPhim: Number(value.maPhim),
+    ngayBatDau: date,        // <--- SỬA
+    ngayKetThuc: value.ngayKetThuc,      // <--- SỬA
+    dinhDang: value.dinhDang,            // <--- SỬA
+    hinhThucDich: value.hinhThucDich,    // <--- SỬA
+    gioBatDau: value.gioBatDau,          // <--- SỬA
+    gioKetThuc: value.gioKetThuc,        // <--- SỬA
+    trangThai: value.trangThai,          
+    giaCoSo: Number(value.giaCoSo)
     };
 
     if (this.isEditing && this.editingSlot) {
-      Object.assign(this.editingSlot, payload);
+
+      const slotId = this.editingSlot.id; // <--- CÓ PHẢI NÓ LÀ undefined KHÔNG?
+
+      if (!slotId) {
+        alert('Lỗi: Không tìm thấy ID suất chiếu đang chỉnh sửa.');
+        return;
+      }
+      // 1. CHỨC NĂNG CẬP NHẬT (API: PUT)
+      this.showtimeService.updateSlot(this.editingSlot.id, payload)
+        .subscribe({
+          next: (updatedSlot) => {
+            // Thay thế bản ghi cũ bằng bản ghi mới từ BE
+            const index = this.suatChieu.findIndex(s => s.id === updatedSlot.id);
+            if (index > -1) {
+              this.suatChieu[index] = updatedSlot;
+            }
+            this.closeModal();
+          },
+          error: (error: HttpErrorResponse) => {
+            console.error('Lỗi khi cập nhật suất chiếu:', error);
+            alert(`Cập nhật thất bại: ${error.error.message || error.statusText}`);
+          }
+        });
     } else {
-      const newId =
-        this.slots.length > 0
-          ? Math.max(...this.slots.map((s) => s.id)) + 1
-          : 1;
-
-      this.slots.push({
-        id: newId,
-        ...payload,
-      });
+      // 2. CHỨC NĂNG TẠO MỚI (API: POST)
+      this.showtimeService.createSlot(payload)
+        .subscribe({
+          next: (newSlot) => {
+            // Thêm bản ghi mới (có ID thật) vào mảng FE
+            this.suatChieu.push(newSlot);
+            this.closeModal();
+            // Lọc lại hoặc gọi applyFilters() nếu cần thiết
+            // this.applyFilters(); 
+          },
+          error: (error: HttpErrorResponse) => {
+            console.error('Lỗi khi tạo suất chiếu:', error);
+            alert(`Tạo mới thất bại: ${error.error.message || error.statusText}`);
+          }
+        });
     }
-
-
-    this.isModalOpen = false;
   }
 
-  deleteSlot(slot: ScreeningSlot) {
+  deleteSlot(slot: SuatChieu) {
     if (!confirm('Bạn chắc chắn muốn xoá suất chiếu này?')) return;
-    this.slots = this.slots.filter((s) => s.id !== slot.id);
+    this.suatChieu = this.suatChieu.filter((s) => s.id !== slot.id);
   }
 
   refresh() {

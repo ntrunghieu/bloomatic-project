@@ -26,6 +26,10 @@
       </div>
     </div>
 
+    <div class="loading-overlay" *ngIf="isLoading">
+      <p>Đang tải dữ liệu...</p>
+    </div>
+
     <div class="table-wrap">
       <table class="data-table">
         <thead>
@@ -70,7 +74,7 @@
             ">
             <td>
               <a href="javascript:void(0)" class="movie-link">
-                {{ getMovieTitle(st.movieId) }}
+                {{ getMovieTitle(st.maPhim) }}
               </a>
             </td>
             <td>
@@ -136,10 +140,10 @@
           <label class="field-label">
             Phim chiếu <span class="required">*</span>
           </label>
-          <select class="field-input" formControlName="movieId">
+          <select class="field-input" formControlName="maPhim">
             <option value="" disabled>Chọn một phim</option>
             <option *ngFor="let m of movies" [value]="m.id">
-              {{ m.title }}
+              {{ m.tenPhim }}
             </option>
           </select>
         </div>

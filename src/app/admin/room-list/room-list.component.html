@@ -20,10 +20,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let r of rooms">
-          <td>{{ r.name }}</td>
-          <td>{{ r.type }}</td>
-          <td>{{ r.rows }}</td>
-          <td>{{ r.cols }}</td>
+          <td>{{ r.tenPhong }}</td>
+          <td>{{ r.loaiPhong }}</td>
+          <td>{{ r.hang }}</td>
+          <td>{{ r.cot }}</td>
           <td class="action-col">
             <button
               type="button"
@@ -92,7 +92,7 @@
             Loại phòng chiếu <span class="required">*</span>
           </label>
           <select class="field-input" formControlName="type">
-            <option *ngFor="let t of roomTypes" [value]="t">
+            <option *ngFor="let t of loaiPhong" [value]="t">
               {{ t }}
             </option>
           </select>

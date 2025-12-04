@@ -1,11 +1,52 @@
 <div class="admin-layout">
     <aside class="sidebar">
-        <div class="sidebar-header">
+        <!-- <div class="sidebar-header">
             <div class="logo-circle">A</div>
             <div class="logo-text">
                 <div class="small">ADMIN</div>
                 <div class="title">Bloomatic</div>
             </div>
+        </div> -->
+
+        <div class="sidebar-user">
+            <button class="user-avatar" type="button" (click)="toggleUserMenu($event)"
+                [attr.aria-expanded]="userMenuOpen">
+                <div class="user-avatar-circle">
+                    <span>{{ userInitials }}</span>
+                    <span class="user-status-dot"></span>
+                </div>
+            </button>
+
+            <div class="logo-text">
+                <div class="small">ADMIN</div>
+                <div class="title">Bloomatic</div>
+            </div>
+
+            <!-- Dropdown -->
+            <div class="user-menu" *ngIf="userMenuOpen">
+                <div class="user-menu-header">
+                    <div class="user-menu-name">{{ adminName || 'Admin' }}</div>
+                    <div class="user-menu-role">Tài khoản quản trị</div>
+                </div>
+
+                <button class="user-menu-item" type="button" (click)="goProfile()">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Thông tin cá nhân</span>
+                </button>
+
+                <button class="user-menu-item" type="button" (click)="goAccountSettings()">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Cài đặt tài khoản</span>
+                </button>
+
+                <hr class="user-menu-divider" />
+
+                <button class="user-menu-item logout" type="button" (click)="onLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
+            
         </div>
 
         <nav class="sidebar-nav">
@@ -25,14 +66,14 @@
                 </button>
 
                 <div class="nav-sub">
-                    <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'overall'"
-                        (click)="activeView = 'overall'">
+                    <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'overall'" (click)="activeView = 'overall'">
                         <span>Tổng quan</span>
                     </a>
                 </div>
             </div>
 
-             <!-- Nhóm: Quản lý rạp chiếu -->
+            <!-- Nhóm: Quản lý rạp chiếu -->
             <div class="nav-group" [class.open]="openGroupSchedule === 'theater'">
                 <button class="nav-group-header" (click)="toggleGroupSchedule('theater')">
                     <span class="icon"><i class="fa-solid fa-city"></i></span>
@@ -40,13 +81,13 @@
                     <span class="chevron"><i class="fa-solid fa-chevron-down"></i></span>
                 </button>
 
-                <div class="nav-sub">               
-                    <a routerLink="/admin/cinemas/list" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'theaterList'"
-                        (click)="activeView = 'theaterList'">
+                <div class="nav-sub">
+                    <a routerLink="/admin/cinemas/list" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'theaterList'" (click)="activeView = 'theaterList'">
                         <span>Danh sách rạp chiếu</span>
                     </a>
-                    <a routerLink="/admin/cinemas/create" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'theaterCreate'"
-                        (click)="activeView = 'theaterCreate'">
+                    <a routerLink="/admin/cinemas/create" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'theaterCreate'" (click)="activeView = 'theaterCreate'">
                         <span>Tạo rạp chiếu</span>
                     </a>
                 </div>
@@ -61,12 +102,12 @@
                 </button>
 
                 <div class="nav-sub">
-                    <a routerLink="/admin/movies/list" routerLinkActive="active"class="nav-sub-item" [class.active]="activeView === 'movieList'"
-                        (click)="activeView = 'movieList'">
+                    <a routerLink="/admin/movies/list" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'movieList'" (click)="activeView = 'movieList'">
                         <span>Danh sách phim</span>
                     </a>
-                    <a routerLink="/admin/movies/create" routerLinkActive="active"class="nav-sub-item" [class.active]="activeView === 'movieCreate'"
-                        (click)="activeView = 'movieCreate'">
+                    <a routerLink="/admin/movies/create" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'movieCreate'" (click)="activeView = 'movieCreate'">
                         <span>Tạo phim</span>
                     </a>
                 </div>
@@ -81,11 +122,11 @@
                 </button>
 
                 <div class="nav-sub">
-                    <a routerLink="/admin/showtimes/list" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'scheduleList'"
-                        (click)="activeView = 'scheduleList'">
+                    <a routerLink="/admin/showtimes/list" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'scheduleList'" (click)="activeView = 'scheduleList'">
                         <span>Danh sách lịch chiếu</span>
                     </a>
-                    <a hidden ="nav-sub-item" [class.active]="activeView === 'scheduleCreate'"
+                    <a hidden="nav-sub-item" [class.active]="activeView === 'scheduleCreate'"
                         (click)="activeView = 'scheduleCreate'">
                         <span>Tạo lịch chiếu</span>
                     </a>
@@ -101,11 +142,11 @@
                 </button>
 
                 <div class="nav-sub">
-                    <a routerLink="/admin/showtimes/sessions" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'showTimeList'"
-                        (click)="activeView = 'showTimeList'">
+                    <a routerLink="/admin/showtimes/sessions" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'showTimeList'" (click)="activeView = 'showTimeList'">
                         <span>Danh sách suất chiếu</span>
                     </a>
-                    <a hidden  class="nav-sub-item" [class.active]="activeView === 'showTimeCreate'"
+                    <a hidden class="nav-sub-item" [class.active]="activeView === 'showTimeCreate'"
                         (click)="activeView = 'showTimeCreate'">
                         <span>Tạo suất chiếu</span>
                     </a>
@@ -121,8 +162,8 @@
                 </button>
 
                 <div class="nav-sub">
-                    <a routerLink="/admin/orders" routerLinkActive="active" class="nav-sub-item" [class.active]="activeView === 'ordersList'"
-                        (click)="activeView = 'orders'">
+                    <a routerLink="/admin/orders" routerLinkActive="active" class="nav-sub-item"
+                        [class.active]="activeView === 'ordersList'" (click)="activeView = 'orders'">
                         <span>Danh sách đơn hàng</span>
                     </a>
                     <!-- <a hidden  class="nav-sub-item" [class.active]="activeView === 'ordersCreate'"
@@ -190,5 +231,40 @@
                 </div>
             </div>
         </nav>
+        <!-- <div class="sidebar-user">
+            <button class="user-avatar" type="button" (click)="toggleUserMenu($event)"
+                [attr.aria-expanded]="userMenuOpen">
+                <div class="user-avatar-circle">
+                    <span>{{ userInitials }}</span>
+                    <span class="user-status-dot"></span>
+                </div>
+            </button>
+
+            
+            <div class="user-menu" *ngIf="userMenuOpen">
+                <div class="user-menu-header">
+                    <div class="user-menu-name">{{ adminName || 'Admin' }}</div>
+                    <div class="user-menu-role">Tài khoản quản trị</div>
+                </div>
+
+                <button class="user-menu-item" type="button" (click)="goProfile()">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Thông tin cá nhân</span>
+                </button>
+
+                <button class="user-menu-item" type="button" (click)="goAccountSettings()">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Cài đặt tài khoản</span>
+                </button>
+
+                <hr class="user-menu-divider" />
+
+                <button class="user-menu-item logout" type="button" (click)="onLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
+            
+        </div> -->
     </aside>
 </div>

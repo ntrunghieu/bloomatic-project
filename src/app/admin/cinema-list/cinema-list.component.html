@@ -8,18 +8,10 @@
 
   <div class="header-row">
     <div class="left">
-      <button
-        class="btn-primary"
-        type="button"
-        (click)="goCreate()"
-      >
+      <button class="btn-primary" type="button" (click)="goCreate()">
         + Tạo rạp chiếu
       </button>
-      <button
-        class="btn-outline"
-        type="button"
-        (click)="refresh()"
-      >
+      <button class="btn-outline" type="button" (click)="refresh()">
         Refresh
       </button>
     </div>
@@ -35,20 +27,14 @@
         </tr>
       </thead>
 
-      <tbody>
-        <tr
-          *ngFor="let c of cinemas | paginate: { itemsPerPage: itemsPerPage, currentPage: page }"
-        >
+      <tbody> 
+        <tr *ngFor="let c of cinemas | paginate: { itemsPerPage: itemsPerPage, currentPage: page }">
           <td>
-            <button
-              type="button"
-              class="link-button"
-              (click)="openDetail(c)"
-            >
-              {{ c.name }}
+            <button type="button" class="link-button" (click)="openDetail(c)">
+              {{ c.tenRap }}
             </button>
           </td>
-          <td>{{ c.address }}</td>
+          <td>{{ c.diaChi }}</td>
           <td>{{ formatDate(c.createdAt) }}</td>
         </tr>
 
@@ -57,15 +43,19 @@
             Chưa có rạp chiếu nào.
           </td>
         </tr>
+
+        <tr *ngIf="loading">
+          <td colspan="3" class="empty-row">Đang tải dữ liệu...</td>
+        </tr>
+        <tr *ngIf="!loading && error">
+          <td colspan="3" class="empty-row">{{ error }}</td>
+        </tr>
+
       </tbody>
     </table>
 
     <div class="pagination-wrap" *ngIf="cinemas.length > itemsPerPage">
-      <pagination-controls
-        previousLabel="‹"
-        nextLabel="›"
-        (pageChange)="page = $event"
-      >
+      <pagination-controls previousLabel="‹" nextLabel="›" (pageChange)="page = $event">
       </pagination-controls>
     </div>
   </div>

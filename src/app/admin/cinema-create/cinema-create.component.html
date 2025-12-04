@@ -78,3 +78,19 @@
     </form>
   </div>
 </div>
+
+<!-- Modal thông báo -->
+<div class="bm-modal-backdrop" *ngIf="notifyOpen">
+  <div class="bm-modal">
+    <h3 class="bm-modal-title">{{ notifyTitle }}</h3>
+    <p class="bm-modal-message">
+      {{ notifyMessage }}
+    </p>
+    <div class="bm-modal-actions">
+      <button type="button" class="btn-primary" (click)="closeNotify()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+

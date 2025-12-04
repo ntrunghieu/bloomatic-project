@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, ElementRef, HostListener } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-left-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './left-sidebar.component.html',
   styleUrl: './left-sidebar.component.css'
 })
@@ -18,6 +20,27 @@ export class LeftSidebarComponent {
   openGroupOrders: string | null = 'orders';
 
   activeView: string = 'dashboard';
+
+  // ==== USER DROPDOWN ====
+  adminName = '';
+  userMenuOpen = false;
+
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private elementRef: ElementRef
+  ) { }
+
+  ngOnInit(): void {
+    this.adminName = this.auth.fullName || 'Admin';
+  }
+
+  get userInitials(): string {
+    if (!this.adminName) return 'A';
+    const parts = this.adminName.trim().split(/\s+/);
+    const letters = parts.map(p => p[0]).join('').substring(0, 2);
+    return letters.toUpperCase();
+  }
 
   toggleGroup(group: string) {
     this.openGroup = this.openGroup === group ? null : group;
@@ -39,6 +62,44 @@ export class LeftSidebarComponent {
   }
   toggleGroupOrders(group: string) {
     this.openGroupOrders = this.openGroupOrders === group ? null : group;
+  }
+
+  // === user menu ===
+  toggleUserMenu(event: MouseEvent) {
+    event.stopPropagation();           // ngăn bubble lên document
+    this.userMenuOpen = !this.userMenuOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+
+    // nếu click nằm ngoài sidebar-user thì mới đóng menu
+    if (!this.elementRef.nativeElement
+      .querySelector('.sidebar-user')
+      ?.contains(target)) {
+      this.userMenuOpen = false;
+    }
+  }
+  
+  closeUserMenuWhenClickOutside() {
+    this.userMenuOpen = false;
+  }
+
+  goProfile() {
+    this.userMenuOpen = false;
+    this.router.navigate(['/admin/profile']);
+  }
+
+  goAccountSettings() {
+    this.userMenuOpen = false;
+    this.router.navigate(['/admin/account-settings']);
+  }
+
+  onLogout() {
+    this.userMenuOpen = false;
+    this.auth.logout();
+    this.router.navigate(['/admin/login']);
   }
 
 }

@@ -3,15 +3,26 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminRoom } from '../room-list/room-list.component';
+import { GheLayoutDto, SeatConfigService } from '../../services/seat-config/seat-config.service';
 
-type SeatType = 'EMPTY' | 'STANDARD' | 'VIP' | 'COUPLE' | 'BLOCK';
+type loaiGhe = 'EMPTY' | 'STANDARD' | 'VIP' | 'COUPLE' | 'BLOCK';
+type loaiPhong = '2D' | '3D' | 'IMAX' | 'VIP';
 
 interface SeatCell {
-  id: string;
-  type: SeatType;
-  coupleGroupId?: string | null;
+  nhanGhe: string;
+  loaiGhe: loaiGhe;
+  nhomCouple?: string | null;
   coupleRole?: 'MAIN' | 'GHOST' | null;
 }
+
+export interface PhongConfig {
+  maPhong: number;
+  tenPhong: string;
+  loaiPhong: loaiPhong;
+  hang: number;
+  cot: number;
+}
+
 
 @Component({
   selector: 'app-room-seat-config',
@@ -21,31 +32,52 @@ interface SeatCell {
   styleUrls: ['./room-seat-config.component.css'],
 })
 export class RoomSeatConfigComponent {
-  room!: AdminRoom;
-  seats: SeatCell[][] = [];
-  selectedSeatType: SeatType = 'STANDARD';
+  room!: PhongConfig;
+  ghe: SeatCell[][] = [];
+  selectedSeatType: loaiGhe = 'STANDARD';
   previousCinemaId: number | null = null;
   isDragging = false;
 
-  constructor(private router: Router, private route: ActivatedRoute) {
+  constructor(private router: Router, private route: ActivatedRoute, private seatConfigService: SeatConfigService,) {
+
+    const maPhongTuUrl = Number(this.route.snapshot.paramMap.get('maPhong'));
+    const idPhong = maPhongTuUrl > 0 ? maPhongTuUrl : 0;
+
     const nav = this.router.getCurrentNavigation();
-    const stateRoom = nav?.extras.state?.['room'] as AdminRoom | undefined;
+    const stateRoom = nav?.extras.state?.['room'] as PhongConfig | undefined;
+
+    console.log('stateRoom nằm ở đây');
+    console.log(stateRoom);
 
     const cinemaIdFromState = nav?.extras.state?.['cinemaId'] as number | undefined;
     this.previousCinemaId = cinemaIdFromState ?? null;
-    const idParam = Number(this.route.snapshot.paramMap.get('id'));
+
+    // const idParam = Number(this.route.snapshot.paramMap.get('id'));
+
+    // 3. Khởi tạo this.room
+    if (stateRoom) {
+      this.room = stateRoom;
+    } else {
+      this.room = {
+        maPhong: idPhong,
+        tenPhong: `Phòng ${idPhong}`,
+        loaiPhong: '2D',
+        hang: 10,
+        cot: 16,
+      } as any;
+      this.room.maPhong = idPhong;
+    }
 
     // demo: nếu không có state thì tạo tạm
-    this.room =
-      stateRoom ?? {
-        id: idParam || 0,
-        name: `Cinema ${idParam || 1}`,
-        type: '2D',
-        rows: 10,
-        cols: 16,
-      };
-
-    this.buildGrid();
+    // this.room =
+    //   stateRoom ?? {
+    //     id: idParam || 0,
+    //     tenPhong: `Cinema ${idParam || 1}`,
+    //     loaiPhong: '2D',
+    //     hang: 10,
+    //     cot: 16,
+    //   };
+    this.loadOrInitGrid();
   }
 
   goBackToCinema() {
@@ -57,20 +89,89 @@ export class RoomSeatConfigComponent {
     }
   }
 
+  private loadOrInitGrid() {
+    if (!this.room?.maPhong) {
+      this.buildGrid();
+      return;
+    }
+
+    this.seatConfigService.getLayout(this.room.maPhong).subscribe({
+      next: (layout: GheLayoutDto) => {
+        // nếu BE trả về layout trống thì vẫn tự buildGrid()
+        if (!layout || !layout.gheDTO || layout.gheDTO.length === 0) {
+          this.buildGrid();
+          return;
+        }
+
+        this.room.hang = layout.hang;
+        this.room.cot = layout.cot;
+
+        // convert từ list seats (BE) -> grid SeatCell[][] (FE đang dùng)
+        this.ghe = [];
+        for (let r = 0; r < layout.hang; r++) {
+          const row: SeatCell[] = [];
+          for (let c = 0; c < layout.cot; c++) {
+            const dto = layout.gheDTO.find(
+              (s) => s.hang === r && s.cot === c
+            );
+
+            if (!dto) {
+              // ô không có dữ liệu -> EMPTY
+              const rowLetter = String.fromCharCode(65 + r); // A,B,C
+              row.push({
+                nhanGhe: `${rowLetter}${c + 1}`,
+                loaiGhe: 'EMPTY',
+                nhomCouple: null,
+                coupleRole: null,
+              });
+            } else {
+              row.push({
+                nhanGhe: dto.nhanGhe,
+                loaiGhe: dto.loaiGhe,
+                nhomCouple: dto.nhomCouple ?? null,
+                coupleRole: dto.coupleRole ?? null,
+              });
+            }
+          }
+          this.ghe.push(row);
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi load layout ghế, fallback buildGrid()', err);
+        this.buildGrid();
+      },
+    });
+  }
+
   buildGrid() {
-    this.seats = [];
-    for (let r = 0; r < this.room.rows; r++) {
+    // this.seats = [];
+    // for (let r = 0; r < this.room.rows; r++) {
+    //   const row: SeatCell[] = [];
+    //   const rowLetter = String.fromCharCode(65 + r);
+    //   for (let c = 1; c <= this.room.cols; c++) {
+    //     row.push({
+    //       id: `${rowLetter}${c}`,
+    //       type: 'EMPTY',
+    //       coupleGroupId: null,
+    //       coupleRole: null,
+    //     });
+    //   }
+    //   this.seats.push(row);
+    // }
+
+    this.ghe = [];
+    for (let r = 0; r < this.room.hang; r++) {
       const row: SeatCell[] = [];
       const rowLetter = String.fromCharCode(65 + r); // A,B,C...
-      for (let c = 1; c <= this.room.cols; c++) {
+      for (let c = 0; c < this.room.cot; c++) {
         row.push({
-          id: `${rowLetter}${c}`,
-          type: 'EMPTY',
-          coupleGroupId: null,
+          nhanGhe: `${rowLetter}${c + 1}`,
+          loaiGhe: 'STANDARD', // hoặc 'EMPTY' nếu muốn mặc định không ghế
+          nhomCouple: null,
           coupleRole: null,
         });
       }
-      this.seats.push(row);
+      this.ghe.push(row);
     }
   }
 
@@ -79,14 +180,14 @@ export class RoomSeatConfigComponent {
   }
 
 
-  setSeatType(type: SeatType) {
+  setSeatType(type: loaiGhe) {
     this.selectedSeatType = type;
   }
 
   seatClasses(cell: SeatCell) {
-    const classes = [cell.type.toLowerCase()]; // 'empty', 'standard', 'vip', 'couple', 'block'
+    const classes = [cell.loaiGhe.toLowerCase()]; // 'empty', 'standard', 'vip', 'couple', 'block'
 
-    if (cell.type === 'COUPLE') {
+    if (cell.loaiGhe === 'COUPLE') {
       if (cell.coupleRole === 'MAIN') {
         classes.push('couple-main');
       } else if (cell.coupleRole === 'GHOST') {
@@ -98,25 +199,25 @@ export class RoomSeatConfigComponent {
   }
 
   seatLabel(cell: SeatCell): string {
-    if (cell.type === 'COUPLE' && cell.coupleRole === 'MAIN' && cell.coupleGroupId) {
+    if (cell.loaiGhe === 'COUPLE' && cell.coupleRole === 'MAIN' && cell.nhomCouple) {
       // "K1-K2" -> thay '-' bằng '–' cho đẹp
-      return cell.coupleGroupId.replace('-', '–');
+      return cell.nhomCouple.replace('-', '–');
     }
 
-    if (cell.type === 'COUPLE' && cell.coupleRole === 'GHOST') {
+    if (cell.loaiGhe === 'COUPLE' && cell.coupleRole === 'GHOST') {
       return '';
     }
 
-    return cell.id;
+    return cell.nhanGhe;
   }
 
 
   private clearCoupleGroup(groupId: string) {
-    for (const row of this.seats) {
+    for (const row of this.ghe) {
       for (const seat of row) {
-        if (seat.coupleGroupId === groupId) {
-          seat.coupleGroupId = null;
-          seat.type = 'EMPTY';
+        if (seat.nhomCouple === groupId) {
+          seat.nhomCouple = null;
+          seat.loaiGhe = 'EMPTY';
           seat.coupleRole = null;
         }
       }
@@ -134,7 +235,7 @@ export class RoomSeatConfigComponent {
   // }
 
   private applySeatType(rowIndex: number, colIndex: number, isFirst: boolean) {
-    const cell = this.seats[rowIndex][colIndex];
+    const cell = this.ghe[rowIndex][colIndex];
 
     // ===== GHẾ COUPLE =====
     if (this.selectedSeatType === 'COUPLE') {
@@ -142,30 +243,30 @@ export class RoomSeatConfigComponent {
       if (!isFirst) return;
 
       // đang là couple -> click lại để huỷ cả cặp
-      if (cell.type === 'COUPLE' && cell.coupleGroupId) {
-        this.clearCoupleGroup(cell.coupleGroupId);
+      if (cell.loaiGhe === 'COUPLE' && cell.nhomCouple) {
+        this.clearCoupleGroup(cell.nhomCouple);
         return;
       }
 
-      const partner = this.seats[rowIndex][colIndex + 1];
+      const partner = this.ghe[rowIndex][colIndex + 1];
 
       // không có ghế bên phải hoặc bị khoá
-      if (!partner || partner.type === 'BLOCK') {
+      if (!partner || partner.loaiGhe === 'BLOCK') {
         alert('Ghế couple phải là 2 ghế trống liền kề cùng hàng.');
         return;
       }
 
       // xoá group cũ nếu có
-      if (partner.coupleGroupId) this.clearCoupleGroup(partner.coupleGroupId);
-      if (cell.coupleGroupId) this.clearCoupleGroup(cell.coupleGroupId);
+      if (partner.nhomCouple) this.clearCoupleGroup(partner.nhomCouple);
+      if (cell.nhomCouple) this.clearCoupleGroup(cell.nhomCouple);
 
-      const groupId = `${cell.id}-${partner.id}`;
+      const groupId = `${cell.nhanGhe}-${partner.nhanGhe}`;
 
-      cell.type = 'COUPLE';
-      partner.type = 'COUPLE';
+      cell.loaiGhe = 'COUPLE';
+      partner.loaiGhe = 'COUPLE';
 
-      cell.coupleGroupId = groupId;
-      partner.coupleGroupId = groupId;
+      cell.nhomCouple = groupId;
+      partner.nhomCouple = groupId;
 
       cell.coupleRole = 'MAIN';   // ghế bên trái: ô chính (rộng gấp đôi)
       partner.coupleRole = 'GHOST'; // ghế bên phải: ô “ẩn”, chỉ để chiếm chỗ
@@ -175,24 +276,24 @@ export class RoomSeatConfigComponent {
     // ===== GHẾ THƯỜNG / VIP / BLOCK =====
 
     // nếu đang là couple thì xoá luôn cặp trước khi tô loại khác
-    if (cell.type === 'COUPLE' && cell.coupleGroupId) {
-      this.clearCoupleGroup(cell.coupleGroupId);
+    if (cell.loaiGhe === 'COUPLE' && cell.nhomCouple) {
+      this.clearCoupleGroup(cell.nhomCouple);
     }
 
     if (isFirst) {
       // click lần đầu: toggle
-      if (cell.type === this.selectedSeatType) {
-        cell.type = 'EMPTY';
-        cell.coupleGroupId = null;
+      if (cell.loaiGhe === this.selectedSeatType) {
+        cell.loaiGhe = 'EMPTY';
+        cell.nhomCouple = null;
       } else {
-        cell.type = this.selectedSeatType;
-        cell.coupleGroupId = null;
+        cell.loaiGhe = this.selectedSeatType;
+        cell.nhomCouple = null;
       }
     } else {
       // đang kéo: cứ tô theo loại đang chọn, không toggle
-      if (cell.type !== this.selectedSeatType) {
-        cell.type = this.selectedSeatType;
-        cell.coupleGroupId = null;
+      if (cell.loaiGhe !== this.selectedSeatType) {
+        cell.loaiGhe = this.selectedSeatType;
+        cell.nhomCouple = null;
       }
     }
   }
@@ -274,10 +375,48 @@ export class RoomSeatConfigComponent {
     this.isDragging = false;
   }
 
-
   saveConfig() {
-    console.log('Save layout for room', this.room, this.seats);
-    alert('Đã lưu cấu hình (demo). Sau này sẽ gọi API lưu layout.');
+    console.log(this.room?.maPhong);
+    if (!this.room?.maPhong) {
+      alert('Không xác định được phòng chiếu.');
+      return;
+    }
+
+    const hang = this.ghe.length;
+    const cot = this.ghe[0]?.length ?? 0;
+
+    const seatsPayload = this.ghe.flatMap((row, r) =>
+      row.map((cell, c) => ({
+        nhanGhe: cell.nhanGhe,
+        hang: r,
+        cot: c,
+        loaiGhe: cell.loaiGhe,
+        nhomCouple: cell.nhomCouple ?? null,
+        coupleRole: cell.coupleRole ?? null,
+      }))
+    );
+
+    const payload: GheLayoutDto = {
+      hang,
+      cot,
+      gheDTO: seatsPayload,
+    };
+
+    this.seatConfigService.saveLayout(this.room.maPhong, payload).subscribe({
+      next: () => {
+        alert('Lưu cấu hình ghế thành công');
+      },
+      error: (err) => {
+        console.error('Lỗi lưu cấu hình ghế', err);
+        alert('Lưu cấu hình ghế thất bại, vui lòng thử lại.');
+      },
+    });
   }
+
+
+  // saveConfig() {
+  //   console.log('Save layout for room', this.room, this.o_ghe);
+  //   alert('Đã lưu cấu hình (demo). Sau này sẽ gọi API lưu layout.');
+  // }
 
 }

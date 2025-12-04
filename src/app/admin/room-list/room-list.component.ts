@@ -9,14 +9,14 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-type RoomType = '2D' | '3D' | 'IMAX' | 'VIP';
+type loaiPhong = '2D' | '3D' | 'IMAX' | 'VIP';
 
 export interface AdminRoom {
   id: number;
-  name: string;
-  type: RoomType;
-  rows: number;
-  cols: number;
+  tenPhong: string;
+  loaiPhong: loaiPhong;
+  hang: number;
+  cot: number;
 }
 
 @Component({
@@ -28,11 +28,11 @@ export interface AdminRoom {
 })
 export class RoomListComponent {
   rooms: AdminRoom[] = [
-    { id: 1, name: 'Cinema 1', type: '2D', rows: 10, cols: 16 },
-    { id: 2, name: 'Cinema 2', type: '3D', rows: 12, cols: 18 },
+    { id: 1, tenPhong: 'Cinema 1', loaiPhong: '2D', hang: 10, cot: 16 },
+    { id: 2, tenPhong: 'Cinema 2', loaiPhong: '3D', hang: 12, cot: 18 },
   ];
 
-  roomTypes: RoomType[] = ['2D', '3D', 'IMAX', 'VIP'];
+  loaiPhong: loaiPhong[] = ['2D', '3D', 'IMAX', 'VIP'];
 
   // form tạo mới
   createForm: FormGroup;
@@ -71,10 +71,10 @@ export class RoomListComponent {
     }
 
     const value = this.createForm.value as {
-      name: string;
-      type: RoomType;
-      rows: number;
-      cols: number;
+      tenPhong: string;
+      loaiPhong: loaiPhong;
+      hang: number;
+      cot: number;
     };
 
     const newId =
@@ -84,10 +84,10 @@ export class RoomListComponent {
 
     const room: AdminRoom = {
       id: newId,
-      name: value.name,
-      type: value.type,
-      rows: value.rows,
-      cols: value.cols,
+      tenPhong: value.tenPhong,
+      loaiPhong: value.loaiPhong,
+      hang: value.hang,
+      cot: value.cot,
     };
 
     this.rooms.push(room);

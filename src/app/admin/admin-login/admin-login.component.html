@@ -1,0 +1,29 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">A</div>
+      <div>
+        <div class="login-title">Bloomatic Admin</div>
+        <div class="login-subtitle">Đăng nhập trang quản trị</div>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label>Tài khoản</label>
+        <input type="text" formControlName="email" placeholder="Nhập email" />
+      </div>
+
+      <div class="form-field">
+        <label>Mật khẩu</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+      </div>
+
+      <div class="error-text" *ngIf="error">{{ error }}</div>
+
+      <button class="btn-login" type="submit" [disabled]="loading">
+        {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+      </button>
+    </form>
+  </div>
+</div>

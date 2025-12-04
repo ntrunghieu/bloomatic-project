@@ -103,3 +103,41 @@
 .footer-row {
   margin-top: 10px;
 }
+
+.bm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000; /* cao hơn sidebar, header, v.v. */
+}
+
+.bm-modal {
+  background-color: #0f172a;
+  color: #e5e7eb;
+  border-radius: 16px;
+  padding: 20px 24px;
+  width: min(420px, 90vw);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.7);
+}
+
+.bm-modal-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.bm-modal-message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.bm-modal-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

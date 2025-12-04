@@ -1,6 +1,6 @@
 // src/app/admin/cinema-detail/cinema-detail.component.ts
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,8 +8,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CinemaService, RapDto, TaoRapRequest } from '../../services/cinema/cinema.service';
+import { PhongDto, RoomService, TaoPhongRequest } from '../../services/room/room.service';
 
-type RoomType = 'Tiêu chuẩn' | 'GOLD CLASS' | 'IMAX';
+type loaiPhong = 'Tiêu chuẩn' | 'GOLD CLASS' | 'IMAX';
 
 interface CinemaDetail {
   id: number;
@@ -19,12 +21,12 @@ interface CinemaDetail {
   createdAt: string;
 }
 
-interface CinemaRoom {
-  id: number;
-  name: string;
-  type: RoomType;
-  rows: number;
-  cols: number;
+interface PhongChieu {
+  maPhong: number;
+  tenPhong: string;
+  loaiPhong: loaiPhong;
+  hang: number;
+  cot: number;
   createdAt: string;
 }
 
@@ -35,17 +37,29 @@ interface CinemaRoom {
   templateUrl: './cinema-detail.component.html',
   styleUrls: ['./cinema-detail.component.css'],
 })
-export class CinemaDetailComponent {
-  cinema!: CinemaDetail;
+export class CinemaDetailComponent implements OnInit {
+  cinema!: RapDto;
+  phong!: PhongDto;
   form: FormGroup;
+  rooms: PhongChieu[] = [];
+  loaiPhong: loaiPhong[] = ['Tiêu chuẩn', 'GOLD CLASS', 'IMAX'];
 
-  rooms: CinemaRoom[] = [];
-  roomTypes: RoomType[] = ['Tiêu chuẩn', 'GOLD CLASS', 'IMAX'];
+  // cinema: RapDto | null = null;
+  loading = false;
 
   // modal tạo phòng chiếu
   isRoomModalOpen = false;
-  editingRoom: CinemaRoom | null = null;
+  editingRoom: PhongChieu | null = null;
   roomForm: FormGroup;
+
+  // modal xác nhận xóa rạp
+  confirmDeleteOpen = false;
+
+  // modal thông báo
+  notifyOpen = false;
+  notifyTitle = '';
+  notifyMessage = '';
+  private notifyAfterClose?: () => void;
 
   // demo data
   private demoCinemas: CinemaDetail[] = [
@@ -58,48 +72,116 @@ export class CinemaDetailComponent {
         'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.9778!2d105.746!3d20.9803',
       createdAt: '2024-03-10',
     },
-    // có thể thêm các rạp demo khác ở đây
   ];
 
-  private demoRoomsByCinema: Record<number, CinemaRoom[]> = {
+  private demoRoomsByCinema: Record<number, PhongChieu[]> = {
     1: [
       {
-        id: 101,
-        name: 'Cinema 1',
-        type: 'Tiêu chuẩn',
-        rows: 14,
-        cols: 16,
+        maPhong: 101,
+        tenPhong: 'Cinema 1',
+        loaiPhong: 'Tiêu chuẩn',
+        hang: 14,
+        cot: 16,
         createdAt: '2024-04-01',
       },
       {
-        id: 102,
-        name: 'GOLD CLASS',
-        type: 'GOLD CLASS',
-        rows: 12,
-        cols: 12,
+        maPhong: 102,
+        tenPhong: 'GOLD CLASS',
+        loaiPhong: 'GOLD CLASS',
+        hang: 12,
+        cot: 12,
         createdAt: '2024-04-01',
       },
       {
-        id: 103,
-        name: 'Cinema 2',
-        type: 'Tiêu chuẩn',
-        rows: 14,
-        cols: 18,
+        maPhong: 103,
+        tenPhong: 'Cinema 2',
+        loaiPhong: 'Tiêu chuẩn',
+        hang: 14,
+        cot: 18,
         createdAt: '2024-04-01',
       },
       {
-        id: 104,
-        name: 'IMAX',
-        type: 'IMAX',
-        rows: 16,
-        cols: 20,
+        maPhong: 104,
+        tenPhong: 'IMAX',
+        loaiPhong: 'IMAX',
+        hang: 16,
+        cot: 20,
         createdAt: '2024-04-01',
       },
     ],
   };
 
-  typeClass(type: RoomType): string {
-    switch (type) {
+
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private cinemaService: CinemaService,
+    private roomService: RoomService
+  ) {
+    // const id = Number(this.route.snapshot.paramMap.get('id') || '1');
+
+    // this.cinema =
+    //   this.demoCinemas.find((c) => c.id === id) ?? this.demoCinemas[0];
+
+    // this.rooms = [...(this.demoRoomsByCinema[this.cinema.id] ?? [])];
+
+    this.form = this.fb.group({
+      tenRap: ['', [Validators.required, Validators.maxLength(160)]],
+      diaChi: ['', Validators.required],
+    });
+
+    this.roomForm = this.fb.group({
+      tenPhong: ['', Validators.required],
+      loaiPhong: ['', Validators.required],
+      hang: ['', [Validators.required, Validators.min(1), Validators.max(30)]],
+      cot: ['', [Validators.required, Validators.min(1), Validators.max(40)]],
+    });
+  }
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const id = idParam ? Number(idParam) : NaN;
+
+    console.log('log', id);
+
+    if (!id || Number.isNaN(id)) {
+      this.router.navigate(['/admin/cinemas/list']);
+      return;
+    }
+
+    this.cinemaService.chiTietRap(id).subscribe({
+      next: (rap: RapDto) => {
+        // map BE -> UI model
+        this.cinema = {
+          id: rap.id,
+          tenRap: rap.tenRap,
+          diaChi: rap.diaChi,
+          createdAt: rap.createdAt ?? new Date().toISOString(),
+        };
+
+        // patch form
+        this.form.patchValue({
+          tenRap: this.cinema.tenRap,
+          diaChi: this.cinema.diaChi,
+        });
+
+        // tạm dùng demo room theo id rạp (nếu là rạp id=1 sẽ có sẵn)
+        // this.rooms = [...(this.demoRoomsByCinema[this.cinema.id] ?? [])];
+        this.loadRooms(this.cinema.id);
+      },
+      error: (err) => {
+        console.error('Lỗi load chi tiết rạp', err);
+        alert('Không tìm thấy rạp chiếu, quay lại danh sách.');
+        this.router.navigate(['/admin/cinemas/list']);
+      },
+    });
+
+    this.loadRooms(id);
+  }
+
+  mapLoaiPhongToLabel(loai: loaiPhong): string {
+    switch (loai) {
       case 'Tiêu chuẩn':
         return 'tag-standard';
       case 'GOLD CLASS':
@@ -111,35 +193,67 @@ export class CinemaDetailComponent {
     }
   }
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
-    const id = Number(this.route.snapshot.paramMap.get('id') || '1');
+  // mapLabelToLoaiPhong(type: loaiPhong): string {
+  //   switch (type) {
+  //     case 'IMAX':
+  //       return 'tag-imax';
+  //     case 'GOLD CLASS':
+  //       return 'tag-gold';
+  //     default:
+  //       return 'tag-standard';
+  //   }
+  // }
 
-    this.cinema =
-      this.demoCinemas.find((c) => c.id === id) ?? this.demoCinemas[0];
+  loadRooms(id: number) {
+    console.log(id);
+    this.roomService.danhSachPhong(id).subscribe({
+      next: (list) => {
+        this.rooms = list.map((p) => ({
+          maPhong: p.maPhong,
+          tenPhong: p.tenPhong,
+          loaiPhong: p.loaiPhong as loaiPhong,  // gán thẳng giá trị BE trả về
+          hang: p.hang,
+          cot: p.cot,
+          createdAt: p.createdAt,
+        }));
 
-    this.rooms = [...(this.demoRoomsByCinema[this.cinema.id] ?? [])];
+        console.log('load rooms nè');
+        console.log(this.rooms);
 
-    this.form = this.fb.group({
-      name: [this.cinema.name, [Validators.required, Validators.maxLength(160)]],
-      address: [this.cinema.address, Validators.required],
-      mapAddress: [this.cinema.mapAddress || ''],
-    });
+        // patch form
+        // this.roomForm.patchValue({
+        //   tenPhong: this.rooms[0].tenPhong,
+        //   loaiPhong: this.rooms[0].loaiPhong,
+        //   hang: this.rooms[0].hang,
+        //   cot: this.rooms[0].cot,
+        // });
 
-    this.roomForm = this.fb.group({
-      name: ['', Validators.required],
-      type: ['Tiêu chuẩn', Validators.required],
-      rows: [10, [Validators.required, Validators.min(1), Validators.max(30)]],
-      cols: [16, [Validators.required, Validators.min(1), Validators.max(40)]],
+      },
+      error: (err) => {
+        console.error('Lỗi load phòng chiếu', err);
+      },
     });
   }
 
+  // loadDetail(id: number) {
+  //   this.loading = true;
+  //   this.cinemaService.chiTietRap(id).subscribe({
+  //     next: (data) => {
+  //       this.cinema = data;
+  //       this.loading = false;
+  //     },
+  //     error: (err) => {
+  //       console.error('Lỗi load chi tiết rạp', err);
+  //       this.loading = false;
+  //       alert('Không tìm thấy rạp, quay lại danh sách.');
+  //       this.router.navigate(['/admin/cinemas/list']);
+  //     },
+  //   });
+  // }
+
   // ====== cinema actions ======
   goBack() {
-    this.router.navigate(['/admin/cinemas']);
+    this.router.navigate(['/admin/cinemas/list']);
   }
 
   updateCinema() {
@@ -147,21 +261,63 @@ export class CinemaDetailComponent {
       this.form.markAllAsTouched();
       return;
     }
-    console.log('Update cinema payload', this.form.value);
-    // TODO: gọi API update
+
+    const v = this.form.value;
+    const payload: TaoRapRequest = {
+      tenRap: v.tenRap.trim(),
+      diaChi: v.diaChi.trim(),
+    };
+
+    this.cinemaService.capNhatRap(this.cinema.id, payload).subscribe({
+      next: (rap) => {
+        this.cinema.tenRap = rap.tenRap;
+        this.cinema.diaChi = rap.diaChi;
+        this.openNotify('Cập nhật thành công', 'Thông tin rạp đã được lưu.');
+      },
+      error: (err) => {
+        console.error('Lỗi cập nhật rạp', err);
+        this.openNotify('Cập nhật thất bại', 'Vui lòng thử lại sau.');
+      },
+    });
+  }
+
+  openDeleteCinema() {
+    this.confirmDeleteOpen = true;
+  }
+
+  cancelDeleteCinema() {
+    this.confirmDeleteOpen = false;
+  }
+
+  confirmDeleteCinema() {
+    this.cinemaService.xoaRap(this.cinema.id).subscribe({
+      next: () => {
+        this.confirmDeleteOpen = false;
+        this.openNotify(
+          'Xóa rạp thành công',
+          `Rạp "${this.cinema.tenRap}" đã được xóa.`,
+          () => this.router.navigate(['/admin/cinemas/list'])
+        );
+      },
+      error: (err) => {
+        console.error('Lỗi xóa rạp', err);
+        this.confirmDeleteOpen = false;
+        this.openNotify('Xóa rạp thất bại', 'Vui lòng thử lại sau.');
+      },
+    });
   }
 
   deleteCinema() {
     if (confirm('Bạn có chắc muốn xóa rạp chiếu này?')) {
-      console.log('Delete cinema', this.cinema.id);
+      // console.log('Delete cinema', this.cinema.id);
       // TODO: gọi API xóa
       this.router.navigate(['/admin/cinemas']);
     }
   }
 
   // ====== rooms actions ======
-  capacity(r: CinemaRoom): number {
-    return r.rows * r.cols;
+  capacity(r: PhongChieu): number {
+    return r.hang * r.cot;
   }
 
   rowEndLetter(rows: number): string {
@@ -175,10 +331,10 @@ export class CinemaDetailComponent {
   openRoomModal() {
     this.editingRoom = null;
     this.roomForm.reset({
-      name: '',
-      type: 'Tiêu chuẩn',
-      rows: 10,
-      cols: 16,
+      tenPhong: '',
+      loaiPhong: null,
+      hang: null,
+      cot: null,
     });
     this.isRoomModalOpen = true;
   }
@@ -188,39 +344,68 @@ export class CinemaDetailComponent {
   }
 
   saveRoom() {
+    console.log('id room');
+    console.log(this.editingRoom);
     if (this.roomForm.invalid) {
       this.roomForm.markAllAsTouched();
       return;
     }
 
     const value = this.roomForm.value as {
-      name: string;
-      type: RoomType;
-      rows: number;
-      cols: number;
+      tenPhong: string;
+      loaiPhong: loaiPhong;
+      hang: number;
+      cot: number;
+    };
+
+    console.log('Giá trị form khi save:', value);
+    console.log('Hàng:', value.hang, 'Cột:', value.cot);
+
+    const payload: TaoPhongRequest = {
+      tenPhong: value.tenPhong.trim(),
+      loaiPhong: value.loaiPhong,
+      hang: value.hang,
+      cot: value.cot,
     };
 
     if (this.editingRoom) {
-      // 👇 CHẾ ĐỘ CẬP NHẬT
-      this.editingRoom.name = value.name;
-      this.editingRoom.type = value.type;
-      this.editingRoom.rows = value.rows;
-      this.editingRoom.cols = value.cols;
-      // có thể cập nhật createdAt nếu bạn muốn
-    } else {
-      // 👇 CHẾ ĐỘ TẠO MỚI (giữ code cũ)
-      const newId =
-        this.rooms.length > 0
-          ? Math.max(...this.rooms.map((r) => r.id)) + 1
-          : 1;
+      const editingId = this.editingRoom.maPhong;
+      // console.log('id room', editingId);
+      // console.log(this.editingRoom);
+      this.roomService.capNhatPhong(this.editingRoom.maPhong, payload).subscribe({
+        next: (p) => {
+          console.log('Dữ liệu phòng chiếu trả về từ API:', p);
+          this.editingRoom!.tenPhong = p.tenPhong;
+          this.editingRoom!.loaiPhong = p.loaiPhong as loaiPhong;
+          this.editingRoom!.hang = p.hang;
+          this.editingRoom!.cot = p.cot;
 
-      this.rooms.push({
-        id: newId,
-        name: value.name,
-        type: value.type,
-        rows: value.rows,
-        cols: value.cols,
-        createdAt: new Date().toISOString(),
+          this.isRoomModalOpen = false;
+          this.openNotify('Cập nhật phòng chiếu thành công', '');
+        },
+        error: (err) => {
+          console.error('Lỗi cập nhật phòng', err);
+          this.openNotify('Cập nhật phòng chiếu thất bại', 'Vui lòng thử lại.');
+        },
+      });
+    } else {
+      this.roomService.taoPhong(this.cinema.id, payload).subscribe({
+        next: (p) => {
+          this.rooms.push({
+            maPhong: p.maPhong,
+            tenPhong: p.tenPhong,
+            loaiPhong: p.loaiPhong as loaiPhong,
+            hang: p.hang,
+            cot: p.cot,
+            createdAt: p.createdAt,
+          });
+          this.isRoomModalOpen = false;
+          this.openNotify('Tạo phòng chiếu thành công', '');
+        },
+        error: (err) => {
+          console.error('Lỗi tạo phòng', err);
+          this.openNotify('Tạo phòng chiếu thất bại', 'Vui lòng thử lại.');
+        },
       });
     }
 
@@ -243,31 +428,87 @@ export class CinemaDetailComponent {
     // this.isRoomModalOpen = false;
   }
 
-  goToSeatConfig(room: CinemaRoom) {
+  goToSeatConfig(room: PhongChieu) {
+    console.log('ma phong');
+    console.log(room.maPhong);
+    const stateRoom = {
+      maPhong: room.maPhong,          
+      tenPhong: room.tenPhong,       
+      loaiPhong: room.loaiPhong,      
+      hang: room.hang,           
+      cot: room.cot,            
+    };
     // tái dùng route cấu hình ghế hiện có
-    this.router.navigate(['/admin/rooms', room.id, 'seat-config'], {
-      state: { room, cinemaId: this.cinema.id },
+    this.router.navigate(['/admin/rooms', room.maPhong, 'seat-config'], {
+      state: {
+        room: stateRoom,
+        cinemaId: this.cinema.id,  
+      },
     });
   }
 
-  editRoom(room: CinemaRoom) {
+  editRoom(room: PhongChieu) {
+    console.log('day nhe');
+    console.log(room);
     this.editingRoom = room;
-    this.roomForm.reset({
-      name: room.name,
-      type: room.type,
-      rows: room.rows,
-      cols: room.cols,
+    // this.roomForm.reset({
+    //   maPhong: room.maPhong,
+    //   tenPhong: room.tenPhong,
+    //   loaiPhong: room.loaiPhong as loaiPhong,
+    //   hang: room.hang,
+    //   cot: room.cot,
+    // });
+
+    this.roomForm.reset();
+
+    this.roomForm.patchValue({
+      tenPhong: room.tenPhong,
+      loaiPhong: room.loaiPhong,
+      hang: room.hang,
+      cot: room.cot,
     });
     this.isRoomModalOpen = true;
   }
 
-  deleteRoom(room: CinemaRoom) {
-    if (confirm(`Xóa phòng chiếu "${room.name}"?`)) {
-      this.rooms = this.rooms.filter((r) => r.id !== room.id);
-    }
+  // deleteRoom(room: PhongChieu) {
+  //   if (confirm(`Xóa phòng chiếu "${room.tenPhong}"?`)) {
+  //     this.rooms = this.rooms.filter((r) => r.id !== room.id);
+  //   }
+  // }
+
+  deleteRoom(room: PhongChieu) {
+    if (!confirm(`Xóa phòng chiếu "${room.tenPhong}"?`)) return;
+
+    this.roomService.xoaPhong(room.maPhong).subscribe({
+      next: () => {
+        this.rooms = this.rooms.filter((r) => r.maPhong !== room.maPhong);
+        this.openNotify('Xóa phòng chiếu thành công', '');
+      },
+      error: (err) => {
+        console.error('Lỗi xóa phòng', err);
+        this.openNotify('Xóa phòng chiếu thất bại', 'Vui lòng thử lại.');
+      },
+    });
   }
 
   formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString('vi-VN');
+  }
+
+  // ====== MODAL THÔNG BÁO ======
+  openNotify(title: string, message: string, afterClose?: () => void) {
+    this.notifyTitle = title;
+    this.notifyMessage = message;
+    this.notifyAfterClose = afterClose;
+    this.notifyOpen = true;
+  }
+
+  closeNotify() {
+    this.notifyOpen = false;
+    if (this.notifyAfterClose) {
+      const fn = this.notifyAfterClose;
+      this.notifyAfterClose = undefined;
+      fn();
+    }
   }
 }

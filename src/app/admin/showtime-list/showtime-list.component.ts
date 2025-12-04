@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,19 +8,28 @@ import {
 } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ShowtimeService } from '../../services/showtime/showtime.service';
 
 type ShowtimeStatus = 'Sắp chiếu' | 'Đang chiếu' | 'Đã chiếu';
 
 interface MovieOption {
   id: number;
-  title: string;
+  tenPhim: string;
 }
 
-interface AdminShowtime {
+// interface AdminShowtime {
+//   id: number;
+//   movieId: number;
+//   startDate: string; 
+//   endDate: string;   
+// }
+
+export interface LichChieuDto {
   id: number;
-  movieId: number;
-  startDate: string; // yyyy-MM-dd
-  endDate: string;   // yyyy-MM-dd
+  maPhim: number;
+  startDate: string;
+  endDate: string;
+  // basePrice: number; 
 }
 
 @Component({
@@ -30,53 +39,57 @@ interface AdminShowtime {
   templateUrl: './showtime-list.component.html',
   styleUrl: './showtime-list.component.css',
 })
-export class ShowtimeListComponent {
+export class ShowtimeListComponent implements OnInit {
   // mock danh sách phim – sau này thay bằng API
-  movies: MovieOption[] = [
-    { id: 1, title: 'Mickey 17' },
-    { id: 2, title: 'Joker: Folie à Deux – Điên Có Đôi' },
-    { id: 3, title: 'Những Mảnh Ghép Cảm Xúc 2' },
-    { id: 4, title: 'Garfield – Mèo Béo Siêu Quậy' },
-    { id: 5, title: 'Kẻ Thứ Thần' },
-  ];
+  // movies: MovieOption[] = [
+  //   { id: 1, title: 'Mickey 17' },
+  //   { id: 2, title: 'Joker: Folie à Deux – Điên Có Đôi' },
+  //   { id: 3, title: 'Những Mảnh Ghép Cảm Xúc 2' },
+  //   { id: 4, title: 'Garfield – Mèo Béo Siêu Quậy' },
+  //   { id: 5, title: 'Kẻ Thứ Thần' },
+  // ];
 
   // mock lịch chiếu
-  showtimes: AdminShowtime[] = [
-    {
-      id: 1,
-      movieId: 1,
-      startDate: '2025-02-28',
-      endDate: '2025-03-23',      
-    },
-    {
-      id: 2,
-      movieId: 2,
-      startDate: '2024-10-04',
-      endDate: '2024-11-10',
+  // showtimes: AdminShowtime[] = [
+  //   {
+  //     id: 1,
+  //     movieId: 1,
+  //     startDate: '2025-02-28',
+  //     endDate: '2025-03-23',      
+  //   },
+  //   {
+  //     id: 2,
+  //     movieId: 2,
+  //     startDate: '2024-10-04',
+  //     endDate: '2024-11-10',
 
-    },
-    {
-      id: 3,
-      movieId: 3,
-      startDate: '2024-06-14',
-      endDate: '2024-07-28',
+  //   },
+  //   {
+  //     id: 3,
+  //     movieId: 3,
+  //     startDate: '2024-06-14',
+  //     endDate: '2024-07-28',
 
-    },
-    {
-      id: 4,
-      movieId: 4,
-      startDate: '2024-05-31',
-      endDate: '2024-06-09',
+  //   },
+  //   {
+  //     id: 4,
+  //     movieId: 4,
+  //     startDate: '2024-05-31',
+  //     endDate: '2024-06-09',
 
-    },
-    {
-      id: 5,
-      movieId: 5,
-      startDate: '2024-05-03',
-      endDate: '2024-06-02',
+  //   },
+  //   {
+  //     id: 5,
+  //     movieId: 5,
+  //     startDate: '2024-05-03',
+  //     endDate: '2024-06-02',
 
-    },
-  ];
+  //   },
+  // ];
+
+  movies: MovieOption[] = [];
+  showtimes: LichChieuDto[] = [];
+  isLoading = true;
 
   // lọc + phân trang
   searchTerm = '';
@@ -89,24 +102,58 @@ export class ShowtimeListComponent {
   // modal
   isModalOpen = false;
   isEditing = false;
-  editingShowtime: AdminShowtime | null = null;
+  editingShowtime: LichChieuDto | null = null;
   showtimeForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private showtimeService: ShowtimeService) {
     this.showtimeForm = this.fb.group({
-      movieId: ['', Validators.required],
+      maPhim: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData() {
+    this.isLoading = true;
+
+    // 1. Lấy danh sách phim
+    this.showtimeService.getMovies().subscribe({
+      next: (data) => {
+        this.movies = data;
+        // console.log('Loaded movies:', this.movies);
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải danh sách phim', err);
+        // Có thể thêm thông báo lỗi ở đây
+      }
+    });
+
+    // 2. Lấy danh sách lịch chiếu
+    this.showtimeService.getShowtimes().subscribe({
+      next: (data) => {
+        this.showtimes = data;
+        this.isLoading = false;
+        // console.log('Loaded showtimes:', this.showtimes);
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải danh sách lịch chiếu', err);
+        this.isLoading = false;
+        // Có thể thêm thông báo lỗi ở đây
+      }
     });
   }
 
   // ====== helpers trạng thái / text ======
 
   getMovieTitle(movieId: number): string {
-    return this.movies.find((m) => m.id === movieId)?.title || '—';
+    return this.movies.find((m) => m.id === movieId)?.tenPhim || '—';
   }
 
-  getStatus(s: AdminShowtime): ShowtimeStatus {
+  getStatus(s: LichChieuDto): ShowtimeStatus {
     const today = new Date().toISOString().slice(0, 10);
     if (s.endDate < today) return 'Đã chiếu';
     if (s.startDate > today) return 'Sắp chiếu';
@@ -137,13 +184,13 @@ export class ShowtimeListComponent {
 
   // ====== lọc + sort ======
 
-  get filteredShowtimes(): AdminShowtime[] {
+  get filteredShowtimes(): LichChieuDto[] {
     let data = [...this.showtimes];
 
     const term = this.searchTerm.trim().toLowerCase();
     if (term) {
       data = data.filter((s) =>
-        this.getMovieTitle(s.movieId).toLowerCase().includes(term)
+        this.getMovieTitle(s.maPhim).toLowerCase().includes(term)
       );
     }
 
@@ -185,20 +232,22 @@ export class ShowtimeListComponent {
     this.isEditing = false;
     this.editingShowtime = null;
     this.showtimeForm.reset({
-      movieId: '',
+      maPhim: '',
       startDate: '',
       endDate: '',
+      // basePrice: 0,
     });
     this.isModalOpen = true;
   }
 
-  openEditModal(st: AdminShowtime) {
+  openEditModal(st: LichChieuDto) {
     this.isEditing = true;
     this.editingShowtime = st;
     this.showtimeForm.setValue({
-      movieId: st.movieId,
+      maPhim: st.maPhim,
       startDate: st.startDate,
       endDate: st.endDate,
+      // basePrice: st.basePrice,
     });
     this.isModalOpen = true;
   }
@@ -213,39 +262,72 @@ export class ShowtimeListComponent {
       return;
     }
 
+    // const formValue = this.showtimeForm.value;
+    // const maPhim = Number(formValue.maPhim);
+    // const startDate = formValue.startDate as string;
+    // const endDate = formValue.endDate as string;
+
     const formValue = this.showtimeForm.value;
-    const movieId = Number(formValue.movieId);
-    const startDate = formValue.startDate as string;
-    const endDate = formValue.endDate as string;
+    console.log('lich chieu');
+    console.log(formValue);
+    const dataToSend: Omit<LichChieuDto, 'id'> = {
+      maPhim: Number(formValue.maPhim),
+      startDate: formValue.startDate as string,
+      endDate: formValue.endDate as string,
+      // basePrice: Number(formValue.basePrice),
+    };
+    console.log(dataToSend);
 
     if (this.isEditing && this.editingShowtime) {
-      this.editingShowtime.movieId = movieId;
-      this.editingShowtime.startDate = startDate;
-      this.editingShowtime.endDate = endDate;
+      // this.editingShowtime.maPhim = maPhim;
+      // this.editingShowtime.startDate = startDate;
+      // this.editingShowtime.endDate = endDate;
+      this.showtimeService.updateShowtime(this.editingShowtime.id, dataToSend).subscribe({
+        next: () => {
+          this.closeModal();
+          this.loadData(); // Tải lại danh sách sau khi cập nhật thành công
+        },
+        error: (err) => console.error('Lỗi khi cập nhật lịch chiếu:', err)
+      });
     } else {
-      const newId =
-        this.showtimes.length > 0
-          ? Math.max(...this.showtimes.map((s) => s.id)) + 1
-          : 1;
+      // const newId =
+      //   this.showtimes.length > 0
+      //     ? Math.max(...this.showtimes.map((s) => s.id)) + 1
+      //     : 1;
 
-      this.showtimes.push({
-        id: newId,
-        movieId,
-        startDate,
-        endDate,
+      // this.showtimes.push({
+      //   id: newId,
+      //   maPhim,
+      //   startDate,
+      //   endDate,
+      // });
+
+      this.showtimeService.createShowtime(dataToSend).subscribe({
+        next: () => {
+          this.closeModal();
+          this.loadData(); // Tải lại danh sách sau khi tạo mới thành công
+        },
+        error: (err) => console.error('Lỗi khi tạo lịch chiếu:', err)
       });
     }
 
     this.isModalOpen = false;
   }
 
-  deleteShowtime(st: AdminShowtime) {
+  deleteShowtime(st: LichChieuDto) {
     if (!confirm('Bạn chắc chắn muốn xoá lịch chiếu này?')) return;
-    this.showtimes = this.showtimes.filter((s) => s.id !== st.id);
+    // this.showtimes = this.showtimes.filter((s) => s.id !== st.id);
+    this.showtimeService.deleteShowtime(st.id).subscribe({
+      next: () => {
+        // Cập nhật local list hoặc tải lại data
+        this.showtimes = this.showtimes.filter((s) => s.id !== st.id);
+      },
+      error: (err) => console.error('Lỗi khi xoá lịch chiếu:', err)
+    });
   }
 
   refresh() {
-    // chừa sẵn để sau này gọi API
+    this.loadData();
     console.log('refresh showtimes...');
   }
 }

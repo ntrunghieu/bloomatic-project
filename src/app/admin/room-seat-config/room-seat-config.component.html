@@ -6,24 +6,24 @@
                 <i class="fa-solid fa-arrow-left"></i> Quay lại
             </button>
         </div>
-        <h2>Cấu hình ghế – {{ room.name }}</h2>
+        <h2>Cấu hình ghế – {{ room.tenPhong }}</h2>
 
         <div class="info-grid">
             <div>
                 <div class="label">Loại phòng</div>
-                <div class="value">{{ room.type }}</div>
+                <div class="value">{{ room.loaiPhong }}</div>
             </div>
             <div>
                 <div class="label">Hàng ghế</div>
-                <div class="value">{{ room.rows }}</div>
+                <div class="value">{{ room.hang }}</div>
             </div>
             <div>
                 <div class="label">Cột ghế</div>
-                <div class="value">{{ room.cols }}</div>
+                <div class="value">{{ room.cot }}</div>
             </div>
             <div>
                 <div class="label">Tổng ghế</div>
-                <div class="value">{{ room.rows * room.cols }}</div>
+                <div class="value">{{ room.hang * room.cot }}</div>
             </div>
         </div>
 
@@ -66,7 +66,7 @@
         <div class="screen-label">MÀN HÌNH</div>
 
         <div class="seat-grid">
-            <div class="seat-row" *ngFor="let row of seats; let r = index">
+            <div class="seat-row" *ngFor="let row of ghe; let r = index">
                 <div class="row-label">
                     {{ rowLabel(r) }}
                 </div>

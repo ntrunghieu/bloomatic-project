@@ -15,6 +15,9 @@
         <button class="btn btn-outline" routerLink="/admin/movies/list">
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </button>
+        <button *ngIf="isEditMode" class="btn btn-danger" (click)="onDelete()">
+            <i class="fa-solid fa-trash"></i> Xóa phim
+        </button>
         <button class="btn btn-primary" (click)="onSubmit()">
             <i class="fa-solid" [ngClass]="isEditMode ? 'fa-save' : 'fa-plus'"></i>
             {{ isEditMode ? 'Cập nhật' : 'Tạo phim' }}
@@ -31,38 +34,53 @@
                         <label>
                             Tên phim <span class="required"> *</span>
                         </label>
-                        <input type="text" formControlName="name" placeholder="Enter name">
+                        <input type="text" formControlName="name" placeholder="VD: Tôi thấy hoa vàng trên cỏ xanh">
                     </div>
 
                     <div class="form-field">
+                        <label>Quốc gia</label>
+                        <input type="text" formControlName="country" placeholder="tên quốc gia">
+
+                        <!-- <select formControlName="country">
+                            <option value="">Chọn quốc gia</option>
+                            <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+                        </select> -->
+                    </div>
+
+                    <div class="form-field">
+                        <label>Thời lượng phim (phút)</label>
+                        <input type="number" formControlName="duration" placeholder="thời lượng phim">
+                    </div>
+
+                    <!-- <div class="form-field">
                         <label>
                             Tên phim (tiếng anh)
                         </label>
                         <input type="text" formControlName="englishName" placeholder="Enter english name">
-                    </div>
+                    </div> -->
 
                     <div class="form-field">
                         <label>
-                            Trailer <span class="required">*</span>
+                            URL Trailer <span class="required">*</span>
                         </label>
-                        <input type="text" formControlName="trailer" placeholder="Enter trailer">
+                        <input type="text" formControlName="trailer" placeholder="dán URL">
                     </div>
 
-                    <div class="form-field">
+                    <!-- <div class="form-field">
                         <label>Mô tả</label>
-                        <textarea formControlName="description" rows="4" placeholder="Enter description"></textarea>
-                    </div>
+                        <textarea formControlName="description" rows="4" placeholder="Mô tả"></textarea>
+                    </div> -->
 
                     <div class="form-field">
                         <label>Thể loại</label>
-                        <ng-select formControlName="genres" [items]="genreOptions" [multiple]="true"
-                            [closeOnSelect]="false" [searchable]="false" placeholder="Chọn thể loại">
+                        <ng-select formControlName="genres" [items]="genreOptions" bindLabel="tenTheLoai" bindValue="maTheLoai"
+                            [multiple]="true" [closeOnSelect]="false" [searchable]="false" placeholder="Chọn thể loại">
                         </ng-select>
                     </div>
 
                     <div class="form-field">
                         <label>Đạo diễn</label>
-                        <input type="text" formControlName="directors" placeholder="Enter name">
+                        <input type="text" formControlName="directors" placeholder="tên đạo diễn">
                         <!-- <ng-select formControlName="directors" [items]="directors" [multiple]="true"
                             [closeOnSelect]="false" [searchable]="false" placeholder="Chọn đạo diễn">
                         </ng-select> -->
@@ -70,7 +88,7 @@
 
                     <div class="form-field">
                         <label>Diễn viên</label>
-                        <input type="text" formControlName="actors" placeholder="Enter name">
+                        <input type="text" formControlName="actors" placeholder="tên diễn viên">
                         <!-- <ng-select formControlName="actors" [items]="actors" [multiple]="true" [closeOnSelect]="false"
                             [searchable]="false" placeholder="Chọn diễn viên">
                         </ng-select> -->
@@ -79,7 +97,7 @@
 
                 <!-- Cột phải -->
                 <div class="form-column">
-                    <div class="form-field">
+                    <!-- <div class="form-field">
                         <label>
                             Hình thức chiếu <span class="required">*</span>
                         </label>
@@ -95,6 +113,11 @@
                             <option value="">Chọn</option>
                             <option *ngFor="let t of translationTypes" [value]="t">{{ t }}</option>
                         </select>
+                    </div> -->
+
+                    <div class="form-field">
+                        <label>Mô tả</label>
+                        <textarea formControlName="description" rows="4" placeholder="Mô tả"></textarea>
                     </div>
 
                     <div class="form-field">
@@ -106,32 +129,24 @@
                     </div>
 
                     <div class="form-field">
-                        <label>Ngày chiếu</label>
-                        <input type="date" formControlName="showDate">
+                        <label>Ngày khởi chiếu</label>
+                        <input type="date" formControlName="initialDate">
                     </div>
 
-                    <div class="form-field">
-                        <label>Năm phát hành</label>
-                        <input type="number" formControlName="releaseYear" placeholder="Enter release year">
+                    <div hidden class="form-field">
+                        <label>Ngày kết thúc</label>
+                        <input type="date" formControlName="endingDate">
                     </div>
 
-                    <div class="form-field">
+                    <!-- <div class="form-field">
                         <label>Thời lượng phim (phút)</label>
                         <input type="number" formControlName="duration" placeholder="Enter duration">
-                    </div>
+                    </div> -->
 
                     <div class="form-field">
                         <label>Trạng thái</label>
                         <select formControlName="status">
-                            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label>Quốc gia</label>
-                        <select formControlName="country">
-                            <option value="">Chọn quốc gia</option>
-                            <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+                            <option *ngFor="let s of statuses" [value]="s" disabled>{{ s }}</option>
                         </select>
                     </div>
 
@@ -150,7 +165,9 @@
 
                             <label style="color: white;" class="btn btn-primary btn-sm poster-btn">
                                 Thay đổi ảnh phim
-                                <input type="file" accept="image/*" (change)="onPosterChange($event)" hidden>
+                                <input type="file" accept="image/*" #fileInput 
+                                (change)="onPosterChange($event)" 
+                                 hidden>
                             </label>
                         </div>
                     </div>

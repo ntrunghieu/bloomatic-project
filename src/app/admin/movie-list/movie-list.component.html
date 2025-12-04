@@ -23,8 +23,7 @@
             <thead>
                 <tr>
                     <th>Tên phim</th>
-                    <th hidden>Năm phát hành</th>
-                    <th>Thể loại</th>           
+                    <th>Thể loại</th>
                     <th>Ngày khởi chiếu</th>
                     <th>Trạng thái</th>
                     <th>Ngày tạo</th>
@@ -38,13 +37,12 @@
                             {{ m.name }}
                         </a>
                     </td>
-                    <td hidden>{{ m.releaseYear }}</td>
                     <td>
                         <span class="badge badge-genre" *ngFor="let g of m.genres">
                             {{ g }}
                         </span>
                     </td>
-                    
+
                     <td>
                         <span class="badge badge-date">
                             {{ m.showDate }}
@@ -52,11 +50,15 @@
                     </td>
                     <td>
                         <span class="badge"
-                            [ngClass]="m.status === 'Công khai' ? 'badge-status-open' : 'badge-status-hidden'">
+                            [ngClass]="m.status === 'Đang chiếu' ? 'badge-status-open' : 'badge-status-hidden'">
                             {{ m.status }}
                         </span>
                     </td>
-                    <td>{{ m.createdDate }}</td>
+                    <td>
+                        <span>
+                            {{ m.createdDate }}
+                        </span>
+                    </td>
                 </tr>
             </tbody>
         </table>

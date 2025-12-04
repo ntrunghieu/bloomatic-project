@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { MovieService, AdminMovieRow, PageResponse } from '../../services/movie/movie.service'; // chỉnh path
 
 @Component({
   selector: 'app-movie-list',
@@ -10,90 +11,85 @@ import { NgxPaginationModule } from 'ngx-pagination';
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.css'
 })
-export class MovieListComponent {
+export class MovieListComponent implements OnInit {
 
-  page = 1;        // trang hiện tại
-  pageSize = 3;   // số dòng / trang
+  page = 1;          // trang hiện tại (1-based cho UI)
+  pageSize = 12;      // số dòng / trang
   pages: number[] = [];
 
-  movies = [
-    {
-      id: 1,
-      name: 'Furiosa: Câu Chuyện Từ Max Điên',
-      releaseYear: 2024,
-      genres: ['Khoa học - viễn tưởng', 'Hành động'],
-      showDate: '17-05-2024',
-      status: 'Công khai',
-      createdDate: '13-04-2024'
-    },
-    {
-      id: 2,
-      name: 'Lật Mặt 7: Một Điều Ước',
-      releaseYear: 2024,
-      genres: ['Tâm lý', 'Tình cảm'],
-      showDate: '26-04-2024',
-      status: 'Công khai',
-      createdDate: '13-04-2024'
-    },
-    {
-      id: 3,
-      name: 'Lật Mặt 7: Một Điều Ước',
-      releaseYear: 2024,
-      genres: ['Tâm lý', 'Tình cảm'],
-      showDate: '26-04-2024',
-      status: 'Công khai',
-      createdDate: '13-04-2024'
-    },
-    {
-      id: 4,
-      name: 'Lật Mặt 7: Một Điều Ước',
-      releaseYear: 2024,
-      genres: ['Tâm lý', 'Tình cảm'],
-      showDate: '26-04-2024',
-      status: 'Công khai',
-      createdDate: '13-04-2024'
-    },
-    {
-      id: 5,
-      name: 'Lật Mặt 7: Một Điều Ước',
-      releaseYear: 2024,
-      genres: ['Tâm lý', 'Tình cảm'],
-      showDate: '26-04-2024',
-      status: 'Công khai',
-      createdDate: '13-04-2024'
-    }
-  ];
+  movies: AdminMovieRow[] = [];
+  totalElements = 0;
+  loading = false;
 
-  ngOnInit() {
-    // nếu movies là mock sẵn thì gọi luôn, nếu load API thì gọi sau khi có data
-    this.updatePages();
+  constructor(private movieService: MovieService) {}
+
+  ngOnInit(): void {
+    this.loadMovies();
+    console.log('ds phim');
+    console.log(this.movies);
   }
 
-  get pagedMovies() {
-    const start = (this.page - 1) * this.pageSize;
-    return this.movies.slice(start, start + this.pageSize);
+  /** Gọi API lấy danh sách phim */
+  loadMovies(): void {
+    this.loading = true;
+
+    // BE dùng page 0-based, nên trừ 1
+    const pageIndex = this.page - 1;
+
+    this.movieService.getMoviesAdmin(pageIndex, this.pageSize).subscribe({
+      next: (res: PageResponse<AdminMovieRow>) => {
+
+        console.log('Dữ liệu PageResponse trả về từ BE:', res);
+        this.movies = res.content;
+        this.totalElements = res.totalElements;
+
+        const totalPages = res.totalPages;
+        this.pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Lỗi load danh sách phim:', err);
+        this.loading = false;
+      }
+    });
   }
 
-  updatePages() {
-    const totalPages = Math.ceil(this.movies.length / this.pageSize);
-    this.pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-
-  goToPage(p: number) {
+  goToPage(p: number): void {
     if (p < 1 || p > this.pages.length) return;
     this.page = p;
+    this.loadMovies();
   }
 
-  prevPage() {
+  prevPage(): void {
     this.goToPage(this.page - 1);
   }
 
-  nextPage() {
+  nextPage(): void {
     this.goToPage(this.page + 1);
   }
 
-  onRefresh() {
-    // TODO: gọi API load lại danh sách
-    console.log('Refresh movie list');
+  onRefresh(): void {
+    this.loadMovies();
+  }
+
+  /** Xóa phim từ danh sách */
+  onDelete(movie: AdminMovieRow): void {
+    const confirmDelete = confirm(`Bạn có chắc muốn xóa phim "${movie.name}" không?`);
+    if (!confirmDelete) return;
+
+    this.movieService.deleteMovie(movie.id).subscribe({
+      next: () => {
+        alert('Xóa phim thành công');
+        // nếu trang hiện tại trống sau khi xóa, có thể lùi 1 trang
+        if (this.movies.length === 1 && this.page > 1) {
+          this.page = this.page - 1;
+        }
+        this.loadMovies();
+      },
+      error: err => {
+        console.error('Lỗi xóa phim:', err);
+        alert('Xóa phim thất bại');
+      }
+    });
   }
 }

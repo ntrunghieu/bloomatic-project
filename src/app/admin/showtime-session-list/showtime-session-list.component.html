@@ -14,8 +14,8 @@
         <label>Rạp chiếu:</label>
         <select [(ngModel)]="selectedCinemaId" (change)="applyFilters()">
           <option value="">Chọn rạp chiếu</option>
-          <option *ngFor="let c of cinemas" [value]="c.id">
-            {{ c.name }}
+          <option *ngFor="let c of rap" [value]="c.id">
+            {{ c.tenRap }}
           </option>
         </select>
       </div>
@@ -25,7 +25,7 @@
         <select [(ngModel)]="selectedRoomId" (change)="applyFilters()">
           <option value="">Chọn phòng chiếu</option>
           <option *ngFor="let r of filteredRooms" [value]="r.id">
-            {{ r.name }}
+            {{ r.tenPhong }}
           </option>
         </select>
       </div>
@@ -53,7 +53,7 @@
       <div class="summary-cinema">
         Rạp:
         <span class="cinema-chip">
-          {{ currentCinema?.name }}
+          {{ currentCinema?.tenRap }}
         </span>
       </div>
     </div>
@@ -62,7 +62,7 @@
   <!-- DANH SÁCH SUẤT CHIẾU -->
   <div class="card" *ngIf="currentCinema && currentRoom; else noRoom">
     <div class="room-title">
-      {{ currentRoom?.name }}
+      {{ currentRoom?.tenPhong }}
     </div>
 
     <div class="table-wrap">
@@ -87,22 +87,22 @@
             <td>
               <div class="movie-cell">
                 <a href="javascript:void(0)" class="movie-link">
-                  {{ getMovieTitle(s.movieId) }}
+                  {{ getMovieTitle(s.maPhim) }}
                 </a>
-                <span class="movie-status" *ngIf="getMovieStatus(s.movieId)">
-                  {{ getMovieStatus(s.movieId) }}
+                <span class="movie-status" *ngIf="getMovieStatus(s.maPhim)">
+                  {{ getMovieStatus(s.maPhim) }}
                 </span>
               </div>
             </td>
             <td>
-              <span class="tag tag-format">{{ s.format }}</span>
+              <span class="tag tag-format">{{ s.dinhDang }}</span>
             </td>
             <td>
-              <span class="tag tag-lang">{{ s.language }}</span>
+              <span class="tag tag-lang">{{ s.hinhThucDich }}</span>
             </td>
             <td>
               <span class="time-chip">
-                {{ s.startTime }} ~ {{ s.endTime }}
+                {{ s.gioBatDau }} ~ {{ s.gioKetThuc }}
               </span>
             </td>
             <td>
@@ -110,7 +110,7 @@
                 {{ s.slotType }}
               </span> -->
               <span class="badge" >
-                {{ s.basePrice | currency:'VND':'symbol':'1.0-0':'vi-VN'}}
+                {{ s.giaCoSo | currency:'VND':'symbol':'1.0-0':'vi-VN'}}
               </span>
             </td>
             <td>
@@ -184,7 +184,7 @@
       <h3>
         {{ isEditing ? 'Cập nhật suất chiếu' : 'Thêm suất chiếu' }}
         <span class="modal-subtitle" *ngIf="currentCinema && currentRoom">
-          ({{ currentCinema?.name }} - {{ currentRoom?.name }})
+          ({{ currentCinema?.tenRap }} - {{ currentRoom?.tenPhong }})
         </span>
       </h3>
       <button class="close-btn" type="button" (click)="closeModal()">×</button>
@@ -196,12 +196,12 @@
           <label class="field-label">
             Phim chiếu <span class="required">*</span>
           </label>
-          <select class="field-input" formControlName="movieId">
+          <select class="field-input" formControlName="maPhim">
             <option value="" disabled>Chọn một phim</option>
-            <option *ngFor="let m of movies" [value]="m.id">
-              {{ m.title }}
-              <ng-container *ngIf="m.status">
-                – {{ m.status }}
+            <option *ngFor="let m of phim" [value]="m.id">
+              {{ m.tenPhim }}
+              <ng-container *ngIf="m.trangThai">
+                – {{ m.trangThai }}
               </ng-container>
             </option>
           </select>
@@ -209,14 +209,21 @@
 
         <div class="field-group">
           <label class="field-label">
-            Ngày chiếu
+            Ngày bắt đầu
           </label>
           <input type="date" class="field-input" [value]="selectedDate" disabled />
         </div>
 
         <div class="field-group">
+          <label class="field-label">
+            Ngày kết thúc
+          </label>
+          <input type="date" class="field-input" formControlName="ngayKetThuc" />
+        </div>
+
+        <div class="field-group">
           <label class="field-label">Hình thức chiếu</label>
-          <select class="field-input" formControlName="format">
+          <select class="field-input" formControlName="dinhDang">
             <option value="2D">2D</option>
             <option value="3D">3D</option>
             <option value="IMAX">IMAX</option>
@@ -225,7 +232,7 @@
 
         <div class="field-group">
           <label class="field-label">Hình thức dịch</label>
-          <select class="field-input" formControlName="language">
+          <select class="field-input" formControlName="hinhThucDich">
             <option value="Phụ đề">Phụ đề</option>
             <option value="Thuyết minh">Thuyết minh</option>
           </select>
@@ -236,7 +243,7 @@
             <label class="field-label">
               Thời gian bắt đầu <span class="required">*</span>
             </label>
-            <input type="time" class="field-input" formControlName="startTime" />
+            <input type="time" class="field-input" formControlName="gioBatDau" />
           </div>
 
           <div class="field-group">
@@ -244,13 +251,13 @@
               Thời gian kết thúc <span class="required">*</span>
             </label>
             <!-- <input type="time" class="field-input" formControlName="endTime" /> -->
-            <input type="time" class="field-input" formControlName="endTime" readonly />
+            <input type="time" class="field-input" formControlName="gioKetThuc" readonly />
           </div>
         </div>
 
         <div class="field-group">
           <label class="field-label">Giá cơ sở</label>
-          <input type="number" class="field-input" formControlName="basePrice" />
+          <input type="number" class="field-input" formControlName="giaCoSo" />
           <!-- <select class="field-input" formControlName="slotType">
             <option value="Theo lịch">Theo lịch</option>
             <option value="Suất đặc biệt">Suất đặc biệt</option>
