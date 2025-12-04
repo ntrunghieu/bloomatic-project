@@ -9,7 +9,7 @@
 
     <div #viewport class="viewport" (mouseenter)="stop()" (mouseleave)="start()">
       <div class="track">
-        <article class="card" *ngFor="let m of movies">
+        <article class="card" *ngFor="let m of nowShowingMovies">
           <div class="poster">
             <img [src]="m.poster" [alt]="m.title" loading="lazy" />
             <span class="badge-age">{{ m.age }}</span>
@@ -21,7 +21,7 @@
           <div class="meta">
             <h3 class="name" [title]="m.title">{{ m.title }}</h3>
             <p class="genres">{{ m.genres.join(', ') }}</p>
-            <p hidden ="rating"><span class="star">★</span>{{ m.rating.toFixed(1) }}</p>
+            <!-- <p hidden ="rating"><span class="star">★</span>{{ m.rating.toFixed(1) }}</p> -->
           </div>
         </article>
       </div>
@@ -102,7 +102,7 @@
 
     <div #viewport class="viewport" (mouseenter)="stop()" (mouseleave)="start()">
       <div class="track">
-        <article class="card" *ngFor="let m of movies">
+        <article class="card" *ngFor="let m of comingSoonMovies">
           <div class="poster">
             <img [src]="m.poster" [alt]="m.title" loading="lazy" />
             <span class="badge-age">{{ m.age }}</span>
@@ -114,7 +114,7 @@
           <div class="meta">
             <h3 class="name" style="color: black;" [title]="m.title">{{ m.title }}</h3>
             <p class="genres" style="color: #111827;">{{ m.genres.join(', ') }}</p>
-            <p hidden class="rating" style="color: black;"><span class="star">★</span>{{ m.rating.toFixed(1) }}</p>
+            <!-- <p hidden class="rating" style="color: black;"><span class="star">★</span>{{ m.rating.toFixed(1) }}</p> -->
           </div>
         </article>
       </div>

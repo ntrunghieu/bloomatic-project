@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 
@@ -12,6 +12,9 @@ export class JwtInterceptor implements HttpInterceptor {
         setHeaders: { Authorization: `Bearer ${token}` }
       });
     }
+
+    console.log('JWT interceptor token:', token);
+    console.log('New Authorization header:', req.headers.get('Authorization'));
     return next.handle(req);
   }
 }

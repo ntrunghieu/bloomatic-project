@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common'; 
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { FooterComponent } from '../footer/footer.component';
 import { TaglineComponent } from '../tagline/tagline.component';
 import { ScheduleComponent } from '../schedule/schedule.component';
 import { MovieListComponent } from "../movie-list/movie-list.component";
+import { HomeMovie, MovieService } from '../services/movie/movie.service';
 
 
 type TrailerThumb = { id: string; thumb: string; title?: string };
@@ -21,7 +22,6 @@ type Movie = {
   age: string;
   dayNo: number;
   genres: string[];
-  rating: number;
   release: string;
   description: string;
   trailerId: string;        // YouTube video id
@@ -36,14 +36,18 @@ type Movie = {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements AfterViewInit, OnDestroy{
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy{
 @ViewChild('track', { static: true }) track!: ElementRef<HTMLDivElement>;
 @ViewChild('viewport', { static: true }) viewport!: ElementRef<HTMLDivElement>;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer, private movieService: MovieService) {}
 
   autoplayMs = 4000;           // 4 giây
   private timer?: any;
+
+    // MỚI: tách 2 mảng
+  nowShowingMovies: HomeMovie[] = [];
+  comingSoonMovies: HomeMovie[] = [];
 
   movies: Movie[] = [
     {
@@ -53,91 +57,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy{
       age: '13+',
       dayNo: 21,
       genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
-      
-    },
-    {
-      id: 2,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
-      
-    },
-    {
-      id: 3,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
-      
-    },
-    {
-      id: 4,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
-      
-    },
-    {
-      id: 5,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
-      
-    },
-    {
-      id: 6,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
-      
-    },
-    {
-      id: 7,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      rating: 8.9,
+      // rating: 8.9,
       release: '17.10.2025',
       description:
         'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
@@ -146,9 +66,33 @@ export class HomeComponent implements AfterViewInit, OnDestroy{
     }
   ];
 
+  // ===== Lifecycle =====
+  ngOnInit(): void {
+    this.loadMovies();
+  }
+
+  ngAfterViewInit(): void {
+    this.start();
+  }
+
+  ngOnDestroy(): void {
+    this.stop();
+  }
+
+  private loadMovies(): void {
+    // Phim đang chiếu
+    this.movieService.getNowShowing().subscribe({
+      next: data => (this.nowShowingMovies = data),
+      error: err => console.error('Lỗi lấy phim đang chiếu', err),
+    });
+
+    // Phim sắp chiếu
+    this.movieService.getComingSoon().subscribe({
+      next: data => (this.comingSoonMovies = data),
+      error: err => console.error('Lỗi lấy phim sắp chiếu', err),
+    });
+  }
   // ===== Carousel controls =====
-  ngAfterViewInit(): void { this.start(); }
-  ngOnDestroy(): void { this.stop(); }
   next() {
     const el = this.viewport?.nativeElement;
     if (!el) return;

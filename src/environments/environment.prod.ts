@@ -1,7 +1,7 @@
 export const environment = {
-    production: true,
+    production: false,
     apiBase: 'http://localhost:8080/api',
-    firebaseConfig : {
+    firebaseConfig: {
         apiKey: "AIzaSyBcXApf_pkg0FQ8EfAbgxvPE2DIzXqkkR8",
         authDomain: "quanlyvattuyte-d0f6d.firebaseapp.com",
         projectId: "quanlyvattuyte-d0f6d",
@@ -10,5 +10,4 @@ export const environment = {
         appId: "1:374310162051:web:44e9f37e96ccfaf3c995b6",
         measurementId: "G-ZVDHE7GRQ7"
     }
-  };
-  
+};
