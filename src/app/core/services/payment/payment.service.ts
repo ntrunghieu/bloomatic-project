@@ -45,25 +45,4 @@ export class PaymentService {
     );
   }
 
-  // MOCK: giả lập gọi API PayPal, trả về luôn một response demo
-  // createPaypalOrder(payload: any): Observable<PaypalCreateOrderResponse> {
-  //   const mock: PaypalCreateOrderResponse = {
-  //     orderId: 'DEMO_ORDER_001',
-  //     approveUrl: 'https://example.com/paypal-demo-checkout', // sau này thay bằng link PayPal thật
-  //     bookingId: 1,
-  //     amount: payload.amount,
-  //     thanhToanId: 1
-  //   };
-
-  //   console.log('PaymentService mock payload =', payload);
-  //   return of(mock);
-  // }
-  // constructor(private http: HttpClient) {}
-
-  // createPaypalOrder(payload: any) {
-  //   return this.http.post<PaypalCreateOrderResponse>(
-  //     `${this.baseUrl}/create-order`,
-  //     payload
-  //   );
-  // }
 }
