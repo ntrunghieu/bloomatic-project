@@ -4,8 +4,10 @@
   <div class="container">
     <h4 class="title" style="padding-top: 20px; padding-bottom:10px; margin-top: 100px;">PHIM ĐANG CHIẾU</h4>
 
-  <button *ngIf="movies.length > 5" class="nav left" (click)="prev()" aria-label="Trước"><i class="fa-solid fa-angle-left"></i></button>
-  <button *ngIf="movies.length > 5" class="nav right" (click)="next()" aria-label="Sau"><i class="fa-solid fa-angle-right"></i></button>
+    <button *ngIf="nowShowingMovies.length > 5" class="nav left" (click)="prev()" aria-label="Trước"><i
+        class="fa-solid fa-angle-left"></i></button>
+    <button *ngIf="nowShowingMovies.length > 5" class="nav right" (click)="next()" aria-label="Sau"><i
+        class="fa-solid fa-angle-right"></i></button>
 
     <div #viewport class="viewport" (mouseenter)="stop()" (mouseleave)="start()">
       <div class="track">
@@ -36,23 +38,14 @@
 
     <!-- Video banner -->
     <div class="video-wrap">
-      <iframe
-        *ngIf="safeSrc"
-        class="player"
-        [src]="safeSrc"
-        title="Trailer"
-        frameborder="0"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen></iframe>
+      <iframe *ngIf="safeSrc" class="player" [src]="safeSrc" title="Trailer" frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
 
       <!-- Thanh “Video khác” -->
       <div class="more">
         <div class="label">Video khác</div>
         <div class="thumbs">
-          <button
-            class="thumb"
-            *ngFor="let t of active?.moreTrailers"
-            (click)="setVideo(t.id)"
+          <button class="thumb" *ngFor="let t of active?.moreTrailers" (click)="setVideo(t.id)"
             [title]="t.title || 'Trailer'">
             <img [src]="t.thumb" alt="thumb" />
           </button>
@@ -97,8 +90,10 @@
   <div class="container">
     <!-- <h4 class="title" style="padding-top: 20px; padding-bottom:10px; margin-top: 100px;">PHIM ĐANG CHIẾU</h4> -->
 
-  <button *ngIf="movies.length > 5" class="nav left" (click)="prev()" aria-label="Trước"><i class="fa-solid fa-angle-left"></i></button>
-  <button *ngIf="movies.length > 5" class="nav right" (click)="next()" aria-label="Sau"><i class="fa-solid fa-angle-right"></i></button>
+    <button *ngIf="comingSoonMovies.length > 5" class="nav left" (click)="prev()" aria-label="Trước"><i
+        class="fa-solid fa-angle-left"></i></button>
+    <button *ngIf="comingSoonMovies.length > 5" class="nav right" (click)="next()" aria-label="Sau"><i
+        class="fa-solid fa-angle-right"></i></button>
 
     <div #viewport class="viewport" (mouseenter)="stop()" (mouseleave)="start()">
       <div class="track">
@@ -129,23 +124,14 @@
 
     <!-- Video banner -->
     <div class="video-wrap">
-      <iframe
-        *ngIf="safeSrc"
-        class="player"
-        [src]="safeSrc"
-        title="Trailer"
-        frameborder="0"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen></iframe>
+      <iframe *ngIf="safeSrc" class="player" [src]="safeSrc" title="Trailer" frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
 
       <!-- Thanh “Video khác” -->
       <div class="more">
         <div class="label">Video khác</div>
         <div class="thumbs">
-          <button
-            class="thumb"
-            *ngFor="let t of active?.moreTrailers"
-            (click)="setVideo(t.id)"
+          <button class="thumb" *ngFor="let t of active?.moreTrailers" (click)="setVideo(t.id)"
             [title]="t.title || 'Trailer'">
             <img [src]="t.thumb" alt="thumb" />
           </button>
@@ -164,7 +150,6 @@
         <p class="desc">{{ active?.description }}</p>
 
         <div class="actions">
-          <!-- <button class="primary">Đặt vé</button> -->
           <button class="ghost" (click)="closeTrailerSC()">Đóng</button>
         </div>
       </div>

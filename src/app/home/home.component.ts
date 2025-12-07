@@ -49,22 +49,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy{
   nowShowingMovies: HomeMovie[] = [];
   comingSoonMovies: HomeMovie[] = [];
 
-  movies: Movie[] = [
-    {
-      id: 1,
-      title: 'Cục Vàng Của Ngoại',
-      poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
-      age: '13+',
-      dayNo: 21,
-      genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
-      // rating: 8.9,
-      release: '17.10.2025',
-      description:
-        'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
-      trailerId: 'dQw4w9WgXcQ',
+  // movies: Movie[] = [
+  //   {
+  //     id: 1,
+  //     title: 'Cục Vàng Của Ngoại',
+  //     poster: 'https://cdna.artstation.com/p/assets/images/images/074/294/018/large/xem-phim-mai-2024-1080-full-vietsub-8292458-bbbbbbbbbbaaaaaaaavvv.jpg?1711702817',
+  //     age: '13+',
+  //     dayNo: 21,
+  //     genres: ['Chính Kịch','Gia Đình','Tâm Lý'],
+  //     // rating: 8.9,
+  //     release: '17.10.2025',
+  //     description:
+  //       'Phim xoay quanh mối quan hệ 3 thế hệ: Bà – Mẹ – Cháu, khai thác sâu tình cảm bà – cháu nhằm tôn vinh giá trị cao đẹp...',
+  //     trailerId: 'dQw4w9WgXcQ',
       
-    }
-  ];
+  //   }
+  // ];
 
   // ===== Lifecycle =====
   ngOnInit(): void {

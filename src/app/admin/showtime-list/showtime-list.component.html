@@ -142,7 +142,7 @@
           </label>
           <select class="field-input" formControlName="maPhim">
             <option value="" disabled>Chọn một phim</option>
-            <option *ngFor="let m of movies" [value]="m.id">
+            <option *ngFor="let m of filteredMovies" [value]="m.id">
               {{ m.tenPhim }}
             </option>
           </select>

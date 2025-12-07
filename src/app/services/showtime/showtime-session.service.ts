@@ -31,8 +31,8 @@ interface SuatChieu {
   maRap: number;
   maPhong: number;
   maPhim: number;
-  ngayBatDau: string; 
-  ngayKetThuc: string;
+  ngayChieu: string; 
+  // ngayKetThuc: string;
   dinhDang: string;     // 2D, 3D, IMAX...
   hinhThucDich: string;   // Phụ đề, Thuyết minh...
   gioBatDau: string;  // HH:mm
@@ -54,13 +54,13 @@ export class ShowtimeSessionService {
   getFilteredSlots(
     maRap: number,
     maPhong: number,
-    ngayBatDau: string
+    ngayChieu: string
     // ngayKetThuc: string
   ): Observable<SuatChieu[]> {
     let params = new HttpParams()
       .set('maRap', maRap.toString())
       .set('maPhong', maPhong.toString())
-      .set('ngayBatDau', ngayBatDau)
+      .set('ngayChieu', ngayChieu)
       // .set('ngayKetThuc', ngayKetThuc); 
 
     return this.http.get<SuatChieu[]>(`${this.apiUrl}/suat-chieu`, { params });

@@ -35,12 +35,21 @@
                             Tên phim <span class="required"> *</span>
                         </label>
                         <input type="text" formControlName="name" placeholder="VD: Tôi thấy hoa vàng trên cỏ xanh">
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('name')?.hasError('required') && movieForm.get('name')?.touched"
+                            class="error-message">
+                            Không được để trống tên phim.
+                        </div>
                     </div>
 
                     <div class="form-field">
                         <label>Quốc gia</label>
                         <input type="text" formControlName="country" placeholder="tên quốc gia">
-
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('country')?.hasError('required') && movieForm.get('country')?.touched"
+                            class="error-message">
+                            Không được để trống quốc gia.
+                        </div>
                         <!-- <select formControlName="country">
                             <option value="">Chọn quốc gia</option>
                             <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
@@ -50,6 +59,11 @@
                     <div class="form-field">
                         <label>Thời lượng phim (phút)</label>
                         <input type="number" formControlName="duration" placeholder="thời lượng phim">
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('duration')?.hasError('min') && movieForm.get('duration')?.touched"
+                            class="error-message">
+                            Thời lượng phim phải ít nhất 45 phút.
+                        </div>
                     </div>
 
                     <!-- <div class="form-field">
@@ -73,14 +87,25 @@
 
                     <div class="form-field">
                         <label>Thể loại</label>
-                        <ng-select formControlName="genres" [items]="genreOptions" bindLabel="tenTheLoai" bindValue="maTheLoai"
-                            [multiple]="true" [closeOnSelect]="false" [searchable]="false" placeholder="Chọn thể loại">
+                        <ng-select formControlName="genres" [items]="genreOptions" bindLabel="tenTheLoai"
+                            bindValue="maTheLoai" [multiple]="true" [closeOnSelect]="false" [searchable]="false"
+                            placeholder="Chọn thể loại">
                         </ng-select>
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('genres')?.hasError('required') && movieForm.get('genres')?.touched"
+                            class="error-message">
+                            Vui lòng chọn ít nhất một thể loại phim.
+                        </div>
                     </div>
 
                     <div class="form-field">
                         <label>Đạo diễn</label>
                         <input type="text" formControlName="directors" placeholder="tên đạo diễn">
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('directors')?.hasError('required') && movieForm.get('directors')?.touched"
+                            class="error-message">
+                            Không được để trống đạo diễn phim.
+                        </div>
                         <!-- <ng-select formControlName="directors" [items]="directors" [multiple]="true"
                             [closeOnSelect]="false" [searchable]="false" placeholder="Chọn đạo diễn">
                         </ng-select> -->
@@ -89,6 +114,11 @@
                     <div class="form-field">
                         <label>Diễn viên</label>
                         <input type="text" formControlName="actors" placeholder="tên diễn viên">
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('actors')?.hasError('required') && movieForm.get('actors')?.touched"
+                            class="error-message">
+                            Không được để trống diễn viên phim.
+                        </div>
                         <!-- <ng-select formControlName="actors" [items]="actors" [multiple]="true" [closeOnSelect]="false"
                             [searchable]="false" placeholder="Chọn diễn viên">
                         </ng-select> -->
@@ -97,27 +127,15 @@
 
                 <!-- Cột phải -->
                 <div class="form-column">
-                    <!-- <div class="form-field">
-                        <label>
-                            Hình thức chiếu <span class="required">*</span>
-                        </label>
-                        <select formControlName="screenType">
-                            <option value="">Chọn</option>
-                            <option *ngFor="let s of screenTypes" [value]="s">{{ s }}</option>
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label>Hình thức dịch</label>
-                        <select formControlName="translationType">
-                            <option value="">Chọn</option>
-                            <option *ngFor="let t of translationTypes" [value]="t">{{ t }}</option>
-                        </select>
-                    </div> -->
 
                     <div class="form-field">
                         <label>Mô tả</label>
                         <textarea formControlName="description" rows="4" placeholder="Mô tả"></textarea>
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('description')?.hasError('required') && movieForm.get('description')?.touched"
+                            class="error-message">
+                            Không được để trống mô tả phim.
+                        </div>
                     </div>
 
                     <div class="form-field">
@@ -126,11 +144,27 @@
                             <option value="">Select a age</option>
                             <option *ngFor="let a of ageRatings" [value]="a">{{ a }}</option>
                         </select>
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('ageRating')?.hasError('required') && movieForm.get('ageRating')?.touched"
+                            class="error-message">
+                            Không được để trống độ tuổi xem phim.
+                        </div>
                     </div>
 
                     <div class="form-field">
                         <label>Ngày khởi chiếu</label>
                         <input type="date" formControlName="initialDate">
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('initialDate')?.hasError('required') && movieForm.get('initialDate')?.touched"
+                            class="error-message">
+                            Vui lòng nhập ngày khởi chiếu.
+                        </div>
+
+                        <div style="color: red;"
+                            *ngIf="movieForm.get('initialDate')?.hasError('dateInPast') && movieForm.get('initialDate')?.touched"
+                            class="error-message">
+                            {{ movieForm.get('initialDate')?.getError('dateInPast')?.message }}
+                        </div>
                     </div>
 
                     <div hidden class="form-field">
@@ -146,7 +180,7 @@
                     <div class="form-field">
                         <label>Trạng thái</label>
                         <select formControlName="status">
-                            <option *ngFor="let s of statuses" [value]="s" disabled>{{ s }}</option>
+                            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
                         </select>
                     </div>
 
@@ -165,9 +199,7 @@
 
                             <label style="color: white;" class="btn btn-primary btn-sm poster-btn">
                                 Thay đổi ảnh phim
-                                <input type="file" accept="image/*" #fileInput 
-                                (change)="onPosterChange($event)" 
-                                 hidden>
+                                <input type="file" accept="image/*" #fileInput (change)="onPosterChange($event)" hidden>
                             </label>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MovieService, PhimRequestPayload, PhimDto } from '../../services/movie/movie.service'; // chỉnh lại path cho đúng
@@ -11,6 +11,28 @@ interface GenreOption {
   maTheLoai: number;
   tenTheLoai: string;
 }
+
+export const dateGreaterThanTodayValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const dateValue = control.value; // Giá trị của FormControl (ngày)
+    
+    if (!dateValue) {
+        return null; // Không có giá trị, bỏ qua kiểm tra (để Validators.required xử lý)
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Chuẩn hóa Today về 00:00:00
+
+    const selectedDate = new Date(dateValue);
+    selectedDate.setHours(0, 0, 0, 0); // Chuẩn hóa ngày được chọn
+
+    // Nếu ngày được chọn < ngày hiện tại
+    if (selectedDate < today) {
+        // Trả về lỗi nếu ngày nhỏ hơn ngày hiện tại
+        return { dateInPast: { message: 'Ngày khởi chiếu không được nhỏ hơn ngày hiện tại.' } };
+    }
+
+    return null; // Hợp lệ
+};
 
 @Component({
   selector: 'app-movie-create',
@@ -37,7 +59,7 @@ export class MovieCreateComponent implements OnInit {
   ageRatings = ['P', 'C13', 'C16', 'C18'];
 
   // map đúng với cột trang_thai trong bảng phim
-  statuses = ['Sắp chiếu', 'Đang chiếu', 'Đã chiếu'];
+  statuses = ['Sắp chiếu', 'Đang chiếu', 'Đã ngừng chiếu'];
 
   countries = ['Việt Nam', 'Mỹ', 'Hàn Quốc', 'Nhật Bản', 'Anh', 'Khác'];
 
@@ -62,19 +84,19 @@ export class MovieCreateComponent implements OnInit {
     this.storage = inject(Storage);
     this.movieForm = this.fb.group({
       name: ['', Validators.required],
-      country: [''],
-      duration: [null, Validators.required],
+      country: ['', Validators.required],
+      duration: [null, [Validators.required, Validators.min(45)]],
       trailer: ['', Validators.required],
-      description: [''],
-      genres: [<number[]>[]],
+      description: ['', Validators.required],
+      genres: [<number[]>[], Validators.required],
       directors: ['', Validators.required],
       actors: ['', Validators.required],
       // screenType: ['', Validators.required],
       // translationType: [''],
-      ageRating: [''],
-      initialDate: [''],               // yyyy-MM-dd
+      ageRating: ['', Validators.required],
+      initialDate: [null, [Validators.required, dateGreaterThanTodayValidator]],            
       endingDate: [''],
-      status: ['Sắp chiếu'],
+      status: ['Sắp chiếu', Validators.required],
       poster: [null],                  // lưu tên file/URL poster
     });
 
@@ -157,6 +179,23 @@ export class MovieCreateComponent implements OnInit {
     return 'Sắp chiếu';
   }
 
+  // Trong class ShowtimeSessionListComponent
+
+  private isDateValidForFiltering(dateString: string): boolean {
+    if (!dateString) return false;
+
+    // Đặt ngày hôm nay về 00:00:00
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Chuyển ngày được chọn về đối tượng Date và đặt giờ về 00:00:00
+    const selectedDate = new Date(dateString);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    // Kiểm tra: ngày được chọn >= ngày hiện tại
+    return selectedDate >= today;
+  }
+
   /** Gọi API lấy dữ liệu phim để patch vào form khi edit */
   loadMovieForEdit(id: number): void {
 
@@ -164,8 +203,8 @@ export class MovieCreateComponent implements OnInit {
       next: (movie: PhimDto) => {
         const selectedNames: string[] = movie.dsMaTheLoai ?? [];
         const selectedIds: number[] = this.genreOptions
-        .filter(option => selectedNames.includes(option.tenTheLoai)) // 💡 So sánh tên
-        .map(option => option.maTheLoai);
+          .filter(option => selectedNames.includes(option.tenTheLoai)) // 💡 So sánh tên
+          .map(option => option.maTheLoai);
 
         this.movieForm.patchValue({
           name: movie.tenPhim,

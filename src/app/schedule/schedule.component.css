@@ -469,6 +469,21 @@ h4 {
 }
 
 /* ===== Seat selection modal ===== */
+
+.seat-timer {
+  padding: 8px 24px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+
+.seat-timer .time {
+  font-weight: 700;
+  margin-left: 4px;
+  color: #f97316; /* cam cam cho nổi, bạn thích màu khác thì đổi */
+}
+
+
 .seat-backdrop {
   position: fixed;
   inset: 0;

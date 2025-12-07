@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <div class="brand-chips">
+  <!-- <div class="brand-chips">
     <button type="button" class="chip" [class.active]="brandFilter === 'all'" (click)="setBrandFilter('all')">
       Tất cả
     </button>
@@ -30,7 +30,7 @@
     <button type="button" class="chip" [class.active]="brandFilter === 'Lotte'" (click)="setBrandFilter('Lotte')">
       Lotte
     </button>
-  </div>
+  </div> -->
 </div>
 
 <div class="schedule-wrap">
@@ -41,11 +41,12 @@
     </div>
 
     <ul class="cinemas">
-      <li *ngFor="let c of visibleCinemas" (click)="selectCinema(c.id)" [class.active]="c.id === selectedCinemaId">
-        <div class="logo">
-          {{ c.brand === 'Bloomatic' ? 'B' : c.brand[0] }}
-        </div>
-        <div class="name">{{ c.name }}</div>
+      <li *ngFor="let c of visibleCinemas" (click)="selectCinema(c.rapId)"
+        [class.active]="c.rapId === selectedCinemaId">
+        <!-- <div class="logo">
+          Bloomatic
+        </div> -->
+        <div class="name">{{ c.tenRap }}</div>
         <div class="chev">›</div>
       </li>
     </ul>
@@ -60,11 +61,11 @@
     <ng-container *ngIf="activeCinemaSchedule as cs; else noCinema">
       <div class="theater-header">
         <div class="logo-big">
-          {{ cs.cinema.brand === 'Bloomatic' ? 'B' : cs.cinema.brand[0] }}
+          Bloomatic
         </div>
         <div class="info">
-          <h6>Lịch chiếu phim {{ cs.cinema.name }}</h6>
-          <div class="address">{{ cs.cinema.address }}</div>
+          <h6>Lịch chiếu phim {{ cs.tenRap }}</h6>
+          <div class="address">{{ cs.diaChi }}</div>
         </div>
       </div>
 
@@ -106,21 +107,21 @@
         <div class="movie" *ngFor="let m of filteredMovies">
           <!-- Poster + age badge -->
           <div class="movie-thumb">
-            <img class="poster" [src]="m.poster" [alt]="m.title" />
+            <img class="poster" [src]="m.poster" [alt]="m.tenPhim" />
             <!-- sau này bạn có thể đổi '16+' thành m.age -->
-            <span class="age-tag">16+</span>
+            <span class="age-tag">{{ m.ageTag }}</span>
           </div>
 
           <!-- Thông tin phim + suất chiếu -->
           <div class="m-info">
-            <div class="m-title">{{ m.title }}</div>
+            <div class="m-title">{{ m.tenPhim }}</div>
             <div class="m-genres">{{ m.genres.join(', ') }}</div>
 
             <div class="formats" *ngFor="let f of m.formats">
               <div class="fmt-name">{{ f.name }}</div>
               <div class="times">
                 <button class="stime" *ngFor="let t of f.times" (click)="openSeatModal(m, f.name, t)">
-                  {{ t }}
+                  {{ t.time }}<span *ngIf="t.endTime"> - {{ t.endTime }}</span>
                 </button>
               </div>
 
@@ -161,6 +162,12 @@
       </button>
       <div class="title">Mua vé xem phim</div>
       <button class="close-btn" type="button" (click)="closeSeatModal()">×</button>
+    </div>
+
+    <!-- timer giữ ghế -->
+    <div class="seat-timer" *ngIf="holdRemainingSeconds > 0">
+      Thời gian giữ ghế còn lại:
+      <span class="time">{{ holdMinutes }}:{{ holdSeconds }}</span>
     </div>
 
     <!-- màn hình -->
@@ -208,7 +215,7 @@
         <div class="mv-seats" *ngIf="selectedSeats.length">
           Chỗ ngồi:
           <span class="mv-seat-code" *ngFor="let s of selectedSeats">
-            {{ s.id }}
+            {{ s.code }}
           </span>
         </div>
       </div>
@@ -259,7 +266,7 @@
             <div class="label">Ghế</div>
             <div class="value">
               <ng-container *ngFor="let s of selectedSeats; let last = last">
-                {{ s.id }}<span *ngIf="!last">, </span>
+                {{ s.code }}<span *ngIf="!last">, </span>
               </ng-container>
             </div>
           </div>

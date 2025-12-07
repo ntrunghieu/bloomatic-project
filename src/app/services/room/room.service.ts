@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+type RoomConfigStatus = Record<number, boolean>;
+
 export interface PhongDto {
   maPhong: number;
   maRap: number;
@@ -71,4 +75,9 @@ export class RoomService {
   luuCauHinhGhe(maPhong: number, ds: GheUpdateReq[]) {
     return this.http.put<void>(`${this.api}/phong/${maPhong}/ghe`, ds);
   }
+
+  getRoomsConfigStatus(): Observable<RoomConfigStatus> {
+    // Gọi API mới
+    return this.http.get<RoomConfigStatus>(`${this.api}/ghe/trang-thai`);
+}
 }

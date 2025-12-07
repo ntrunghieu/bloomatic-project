@@ -6,7 +6,7 @@
         <a routerLink="/admin/cinemas/list">Danh sách rạp chiếu</a>
         <span>/</span>
         <span>{{ form.get('tenRap')?.value }}</span>
-         <!-- <span>{{ cinema.tenRap }}</span> -->
+        <!-- <span>{{ cinema.tenRap }}</span> -->
     </nav>
 
     <!-- TOP: thông tin rạp + map -->
@@ -97,6 +97,14 @@
                             </span>
 
                         </td>
+                        <!-- <td [ngClass]="{'configured': r.daCauHinh, 'not-configured': !r.daCauHinh}">
+                            <ng-container *ngIf="r.daCauHinh">
+                                ✅ Đã cấu hình
+                            </ng-container>
+                            <ng-container *ngIf="!r.daCauHinh">
+                                ❌ Chưa cấu hình
+                            </ng-container>
+                        </td> -->
                         <td>{{ capacity(r) }}</td>
                         <td>{{ r.hang }} (A → {{ rowEndLetter(r.hang) }})</td>
                         <td>{{ r.cot }} (01 → {{ r.cot | number: '2.0' }})</td>
@@ -245,36 +253,35 @@
 
 <!-- Modal xác nhận xóa rạp -->
 <div class="bm-modal-backdrop" *ngIf="confirmDeleteOpen">
-  <div class="bm-modal">
-    <h3 class="bm-modal-title">Xóa rạp chiếu</h3>
-    <p class="bm-modal-message">
-      Bạn có chắc chắn muốn xóa rạp
-      <strong style="color: red">{{ cinema.tenRap }}</strong> không? Hành động này
-      không thể hoàn tác.
-    </p>
-    <div class="bm-modal-actions">
-      <button type="button" class="btn-outline" (click)="cancelDeleteCinema()">
-        Hủy
-      </button>
-      <button type="button" class="btn-danger" (click)="confirmDeleteCinema()">
-        Xóa
-      </button>
+    <div class="bm-modal">
+        <h3 class="bm-modal-title">Xóa rạp chiếu</h3>
+        <p class="bm-modal-message">
+            Bạn có chắc chắn muốn xóa rạp
+            <strong style="color: red">{{ cinema.tenRap }}</strong> không? Hành động này
+            không thể hoàn tác.
+        </p>
+        <div class="bm-modal-actions">
+            <button type="button" class="btn-outline" (click)="cancelDeleteCinema()">
+                Hủy
+            </button>
+            <button type="button" class="btn-danger" (click)="confirmDeleteCinema()">
+                Xóa
+            </button>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Modal thông báo -->
 <div class="bm-modal-backdrop" *ngIf="notifyOpen">
-  <div class="bm-modal">
-    <h3 class="bm-modal-title">{{ notifyTitle }}</h3>
-    <p class="bm-modal-message">
-      {{ notifyMessage }}
-    </p>
-    <div class="bm-modal-actions">
-      <button type="button" class="btn-primary" (click)="closeNotify()">
-        OK
-      </button>
+    <div class="bm-modal">
+        <h3 class="bm-modal-title">{{ notifyTitle }}</h3>
+        <p class="bm-modal-message">
+            {{ notifyMessage }}
+        </p>
+        <div class="bm-modal-actions">
+            <button type="button" class="btn-primary" (click)="closeNotify()">
+                OK
+            </button>
+        </div>
     </div>
-  </div>
 </div>
-

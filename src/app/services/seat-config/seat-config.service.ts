@@ -37,4 +37,9 @@ export class SeatConfigService {
   saveLayout(roomId: number, layout: GheLayoutDto): Observable<GheLayoutDto> {
     return this.http.post<GheLayoutDto>(`${this.baseUrl}/admin/phong-config/${roomId}/ghe-config`, layout);
   }
+
+  deleteLayout(maPhong: number): Observable<void> {
+    // Gọi API DELETE tới endpoint Backend
+    return this.http.delete<void>(`${this.baseUrl}/admin/phong-config/${maPhong}/ghe-config`);
+}
 }

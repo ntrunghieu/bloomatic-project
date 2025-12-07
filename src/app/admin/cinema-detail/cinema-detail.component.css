@@ -361,3 +361,6 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+.configured { color: green; font-weight: 500; }
+.not-configured { color: red; }

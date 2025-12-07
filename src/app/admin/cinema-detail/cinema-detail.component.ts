@@ -30,6 +30,12 @@ interface PhongChieu {
   createdAt: string;
 }
 
+interface PhongChieuUI extends PhongChieu {
+  daCauHinh: boolean
+}
+
+type RoomConfigStatus = Record<number, boolean>;
+
 @Component({
   selector: 'app-cinema-detail',
   standalone: true,
@@ -42,7 +48,10 @@ export class CinemaDetailComponent implements OnInit {
   phong!: PhongDto;
   form: FormGroup;
   rooms: PhongChieu[] = [];
+  phongUI: PhongChieuUI[] = [];
   loaiPhong: loaiPhong[] = ['Tiêu chuẩn', 'GOLD CLASS', 'IMAX'];
+  filteredRooms: PhongChieuUI[] = [];
+  roomConfigStatus: RoomConfigStatus = {};
 
   // cinema: RapDto | null = null;
   loading = false;
@@ -74,42 +83,42 @@ export class CinemaDetailComponent implements OnInit {
     },
   ];
 
-  private demoRoomsByCinema: Record<number, PhongChieu[]> = {
-    1: [
-      {
-        maPhong: 101,
-        tenPhong: 'Cinema 1',
-        loaiPhong: 'Tiêu chuẩn',
-        hang: 14,
-        cot: 16,
-        createdAt: '2024-04-01',
-      },
-      {
-        maPhong: 102,
-        tenPhong: 'GOLD CLASS',
-        loaiPhong: 'GOLD CLASS',
-        hang: 12,
-        cot: 12,
-        createdAt: '2024-04-01',
-      },
-      {
-        maPhong: 103,
-        tenPhong: 'Cinema 2',
-        loaiPhong: 'Tiêu chuẩn',
-        hang: 14,
-        cot: 18,
-        createdAt: '2024-04-01',
-      },
-      {
-        maPhong: 104,
-        tenPhong: 'IMAX',
-        loaiPhong: 'IMAX',
-        hang: 16,
-        cot: 20,
-        createdAt: '2024-04-01',
-      },
-    ],
-  };
+  // private demoRoomsByCinema: Record<number, PhongChieu[]> = {
+  //   1: [
+  //     {
+  //       maPhong: 101,
+  //       tenPhong: 'Cinema 1',
+  //       loaiPhong: 'Tiêu chuẩn',
+  //       hang: 14,
+  //       cot: 16,
+  //       createdAt: '2024-04-01',
+  //     },
+  //     {
+  //       maPhong: 102,
+  //       tenPhong: 'GOLD CLASS',
+  //       loaiPhong: 'GOLD CLASS',
+  //       hang: 12,
+  //       cot: 12,
+  //       createdAt: '2024-04-01',
+  //     },
+  //     {
+  //       maPhong: 103,
+  //       tenPhong: 'Cinema 2',
+  //       loaiPhong: 'Tiêu chuẩn',
+  //       hang: 14,
+  //       cot: 18,
+  //       createdAt: '2024-04-01',
+  //     },
+  //     {
+  //       maPhong: 104,
+  //       tenPhong: 'IMAX',
+  //       loaiPhong: 'IMAX',
+  //       hang: 16,
+  //       cot: 20,
+  //       createdAt: '2024-04-01',
+  //     },
+  //   ],
+  // };
 
 
   constructor(
@@ -135,7 +144,7 @@ export class CinemaDetailComponent implements OnInit {
       tenPhong: ['', Validators.required],
       loaiPhong: ['', Validators.required],
       hang: ['', [Validators.required, Validators.min(1), Validators.max(30)]],
-      cot: ['', [Validators.required, Validators.min(1), Validators.max(40)]],
+      cot: ['', [Validators.required, Validators.min(1), Validators.max(40)]]
     });
   }
 
@@ -193,40 +202,25 @@ export class CinemaDetailComponent implements OnInit {
     }
   }
 
-  // mapLabelToLoaiPhong(type: loaiPhong): string {
-  //   switch (type) {
-  //     case 'IMAX':
-  //       return 'tag-imax';
-  //     case 'GOLD CLASS':
-  //       return 'tag-gold';
-  //     default:
-  //       return 'tag-standard';
-  //   }
-  // }
+  // Trong ShowtimeSessionListComponent
 
   loadRooms(id: number) {
     console.log(id);
     this.roomService.danhSachPhong(id).subscribe({
       next: (list) => {
+        // 1. Map dữ liệu về PhongChieuUI[] và KHỞI TẠO trường daCauHinh
         this.rooms = list.map((p) => ({
           maPhong: p.maPhong,
           tenPhong: p.tenPhong,
-          loaiPhong: p.loaiPhong as loaiPhong,  // gán thẳng giá trị BE trả về
+          loaiPhong: p.loaiPhong as loaiPhong,
           hang: p.hang,
           cot: p.cot,
           createdAt: p.createdAt,
-        }));
+          daCauHinh: false
+        })) as PhongChieuUI[];
 
-        console.log('load rooms nè');
-        console.log(this.rooms);
+        this.mergeConfigStatus();
 
-        // patch form
-        // this.roomForm.patchValue({
-        //   tenPhong: this.rooms[0].tenPhong,
-        //   loaiPhong: this.rooms[0].loaiPhong,
-        //   hang: this.rooms[0].hang,
-        //   cot: this.rooms[0].cot,
-        // });
 
       },
       error: (err) => {
@@ -235,21 +229,20 @@ export class CinemaDetailComponent implements OnInit {
     });
   }
 
-  // loadDetail(id: number) {
-  //   this.loading = true;
-  //   this.cinemaService.chiTietRap(id).subscribe({
-  //     next: (data) => {
-  //       this.cinema = data;
-  //       this.loading = false;
-  //     },
-  //     error: (err) => {
-  //       console.error('Lỗi load chi tiết rạp', err);
-  //       this.loading = false;
-  //       alert('Không tìm thấy rạp, quay lại danh sách.');
-  //       this.router.navigate(['/admin/cinemas/list']);
-  //     },
-  //   });
-  // }
+  // BẠN CŨNG PHẢI ĐẢM BẢO RẰNG mergeConfigStatus() ĐƯỢC ĐỊNH NGHĨA:
+  mergeConfigStatus() {
+    // Chỉ kết hợp nếu cả danh sách phòng và trạng thái đã được tải
+    if (this.rooms.length > 0 && Object.keys(this.roomConfigStatus).length > 0) {
+      this.rooms = this.rooms.map(room => {
+        const maPhong = room.maPhong;
+        return {
+          ...room,
+          // Lấy trạng thái từ map: roomConfigStatus[maPhong] || false
+          daCauHinh: this.roomConfigStatus[maPhong] || false
+        };
+      }) as PhongChieuUI[];
+    }
+  }
 
   // ====== cinema actions ======
   goBack() {
@@ -365,7 +358,7 @@ export class CinemaDetailComponent implements OnInit {
       tenPhong: value.tenPhong.trim(),
       loaiPhong: value.loaiPhong,
       hang: value.hang,
-      cot: value.cot,
+      cot: value.cot
     };
 
     if (this.editingRoom) {
@@ -397,7 +390,7 @@ export class CinemaDetailComponent implements OnInit {
             loaiPhong: p.loaiPhong as loaiPhong,
             hang: p.hang,
             cot: p.cot,
-            createdAt: p.createdAt,
+            createdAt: p.createdAt
           });
           this.isRoomModalOpen = false;
           this.openNotify('Tạo phòng chiếu thành công', '');
@@ -432,17 +425,17 @@ export class CinemaDetailComponent implements OnInit {
     console.log('ma phong');
     console.log(room.maPhong);
     const stateRoom = {
-      maPhong: room.maPhong,          
-      tenPhong: room.tenPhong,       
-      loaiPhong: room.loaiPhong,      
-      hang: room.hang,           
-      cot: room.cot,            
+      maPhong: room.maPhong,
+      tenPhong: room.tenPhong,
+      loaiPhong: room.loaiPhong,
+      hang: room.hang,
+      cot: room.cot,
     };
     // tái dùng route cấu hình ghế hiện có
     this.router.navigate(['/admin/rooms', room.maPhong, 'seat-config'], {
       state: {
         room: stateRoom,
-        cinemaId: this.cinema.id,  
+        cinemaId: this.cinema.id,
       },
     });
   }

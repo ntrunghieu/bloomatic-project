@@ -53,7 +53,6 @@ export class ShowtimeService {
 
   // Lấy danh sách lịch chiếu
   getShowtimes(): Observable<LichChieuDto[]> {
-    // GỌI API: GET /api/admin/showtimes
     return this.http.get<LichChieuDto[]>(`${this.apiUrl}/lich-chieu`);
   }
   // getShowtimes(): Observable<LichChieuDto[]> {

@@ -1,7 +1,7 @@
 // src/app/admin/showtime-session-list/showtime-session-list.component.ts
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { AbstractControl, FormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import {
   FormBuilder,
   FormGroup,
@@ -34,13 +34,20 @@ interface Phim {
 type SlotType = 'Theo lịch' | 'Suất đặc biệt';
 type TrangThai = 'Đang chiếu' | 'Sắp chiếu' | 'Đã chiếu';
 
+export interface LichChieuDto {
+  id: number;
+  maPhim: number;
+  startDate: string; 
+  endDate: string;   
+}
+
 interface SuatChieu {
   id: number;
   maRap: number;
   maPhong: number;
   maPhim: number;
-  ngayBatDau: string;
-  ngayKetThuc: string;
+  ngayChieu: string;
+  // ngayKetThuc: string;
   dinhDang: string;     // 2D, 3D, IMAX...
   hinhThucDich: string;   // Phụ đề, Thuyết minh...
   gioBatDau: string;  // HH:mm
@@ -62,6 +69,7 @@ export class ShowtimeSessionListComponent implements OnInit {
   phong: Phong[] = [];
   phim: Phim[] = [];
   suatChieu: SuatChieu[] = [];
+  lichChieuList: LichChieuDto[] = [];
 
   // ==== FILTER STATE ====
   selectedCinemaId: string = '';
@@ -78,15 +86,65 @@ export class ShowtimeSessionListComponent implements OnInit {
   editingSlot: SuatChieu | null = null;
   slotForm: FormGroup;
 
+  // ==== TOASTER STATE ====
+  toasterMessage: string = '';
+  isToasterVisible: boolean = false;
+  toasterType: 'success' | 'error' | 'info' = 'info';
+
+  static validateStartTime(selectedDate: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const startTime = control.value as string; // Giá trị: "HH:mm"
+
+      // 1. Thoát nếu không có giá trị
+      if (!startTime || !selectedDate) {
+        return null;
+      }
+
+      const today = new Date();
+      // Chuyển đổi selectedDate thành đối tượng Date để so sánh ngày
+      // Lưu ý: new Date(ISO_DATE) sẽ mặc định là 00:00:00 UTC, cần dùng cách so sánh ngày chính xác
+      const selectedDateString = new Date(selectedDate).toDateString();
+      const todayDateString = today.toDateString();
+
+
+      // 2. Nếu ngày được chọn KHÔNG phải là ngày hôm nay, Validator HỢP LỆ (return null)
+      if (selectedDateString !== todayDateString) {
+        return null;
+      }
+
+      // 3. Nếu LÀ ngày hôm nay, tiến hành kiểm tra giờ
+      const [h, m] = startTime.split(':').map(Number);
+
+      const currentHour = today.getHours();
+      const currentMinute = today.getMinutes();
+
+      // So sánh giờ: Nếu Giờ chọn < Giờ hiện tại HOẶC (Giờ chọn = Giờ hiện tại VÀ Phút chọn <= Phút hiện tại)
+      if (h < currentHour || (h === currentHour && m <= currentMinute)) {
+        return { 'startTimePast': true };
+      }
+
+      // 4. Giờ hợp lệ
+      return null;
+    };
+  }
+
   constructor(private fb: FormBuilder, private showtimeService: ShowtimeSessionService) {
+    const initialDate = new Date().toISOString().slice(0, 10);
+
     this.slotForm = this.fb.group({
       // Tên control phải khớp với HTML (maPhim, dinhDang, gioBatDau, ...)
+      // id: ['', Validators.required],
       maPhim: ['', Validators.required],
-      ngayKetThuc: ['', Validators.required], // Thêm trường mới từ HTML
+      ngayChieu: ['', Validators.required], 
       dinhDang: ['2D', Validators.required],
       hinhThucDich: ['Phụ đề', Validators.required],
-      gioBatDau: ['', Validators.required],
-      // Giờ kết thúc vẫn là readonly/disabled nên cần value/disabled options
+      gioBatDau: [
+        '',
+        [
+          Validators.required,
+          ShowtimeSessionListComponent.validateStartTime(initialDate)
+        ]
+      ],
       gioKetThuc: ['', { value: '', disabled: true }],
       giaCoSo: ['', Validators.required],
     });
@@ -104,6 +162,42 @@ export class ShowtimeSessionListComponent implements OnInit {
     // Chức năng này sẽ được gọi bên trong loadInitialData hoặc sau khi data có đủ
   }
 
+  private showToaster(message: string, type: 'success' | 'error' | 'info' = 'info') {
+    this.toasterMessage = message;
+    this.toasterType = type;
+    this.isToasterVisible = true;
+
+    // Tự động ẩn sau 3 giây
+    setTimeout(() => {
+      this.isToasterVisible = false;
+    }, 3000);
+  }
+
+  private getLichChieuIdByPhimId(maPhim: number, ngayChieu: string): number | null {
+      // Ngày chiếu đang được chọn (YYYY-MM-DD)
+      const currentDate = ngayChieu; 
+      
+      // Tìm LichChieu có maPhim tương ứng VÀ ngày chiếu nằm trong khoảng startDate/endDate
+      const foundSchedule = this.lichChieuList.find(lc => 
+          lc.maPhim === maPhim &&
+          lc.startDate <= currentDate && // Ngày bắt đầu <= Ngày hiện tại
+          lc.endDate >= currentDate     // Ngày kết thúc >= Ngày hiện tại
+      );
+      
+      return foundSchedule ? foundSchedule.id : null;
+  }
+
+  private updateStartTimeValidator() {
+    const startTimeControl = this.slotForm.get('gioBatDau');
+    if (startTimeControl) {
+      startTimeControl.setValidators([
+        Validators.required,
+        ShowtimeSessionListComponent.validateStartTime(this.selectedDate) // Dùng selectedDate
+      ]);
+      startTimeControl.updateValueAndValidity(); // Kích hoạt chạy validator ngay lập tức
+    }
+  }
+
   // ========= NEW: LOAD INITIAL DATA =========
 
   private loadInitialData() {
@@ -114,7 +208,6 @@ export class ShowtimeSessionListComponent implements OnInit {
           this.rap = rap;
           this.phong = phong;
           this.phim = phim;
-
           // Sau khi load xong data, áp dụng bộ lọc ban đầu
           this.applyFilters();
         },
@@ -199,8 +292,8 @@ export class ShowtimeSessionListComponent implements OnInit {
 
   getSlotStatus(slot: SuatChieu): string {
     const today = new Date().toISOString().slice(0, 10);
-    if (slot.ngayBatDau < today) return 'Đã chiếu';
-    if (slot.ngayBatDau > today) return 'Sắp chiếu';
+    if (slot.ngayChieu < today) return 'Đã chiếu';
+    if (slot.ngayChieu > today) return 'Sắp chiếu';
     return 'Đang chiếu';
   }
 
@@ -232,7 +325,7 @@ export class ShowtimeSessionListComponent implements OnInit {
 
     if (cid) data = data.filter((s) => s.maRap === cid);
     if (rid) data = data.filter((s) => s.maPhong === rid);
-    if (date) data = data.filter((s) => s.ngayBatDau === date);
+    if (date) data = data.filter((s) => s.ngayChieu === date);
 
     // sort theo giờ chiếu tăng dần
     data.sort((a, b) => a.gioBatDau.localeCompare(b.gioBatDau));
@@ -258,6 +351,7 @@ export class ShowtimeSessionListComponent implements OnInit {
           console.log('suat chieu day nè')
           console.log(data)
           this.suatChieu = data;
+          
         },
         error: (err) => {
           console.error('Lỗi khi tải suất chiếu:', err);
@@ -274,7 +368,7 @@ export class ShowtimeSessionListComponent implements OnInit {
     const cid = Number(this.selectedCinemaId);
     const rid = Number(this.selectedRoomId);
     if (!cid || !rid || !this.selectedDate) {
-      alert('Vui lòng chọn Rạp chiếu, Phòng chiếu và Ngày chiếu trước.');
+      this.showToaster('Vui lòng chọn Rạp chiếu, Phòng chiếu và Ngày chiếu trước.', 'error');
       return;
     }
 
@@ -284,13 +378,14 @@ export class ShowtimeSessionListComponent implements OnInit {
       maPhim: '',
       dinhDang: '2D',
       hinhThucDich: 'Phụ đề',
-      ngayBatDau: '',
-      ngayKetThuc: '',
+      ngayChieu: this.selectedDate,
+      // ngayKetThuc: '',
       gioBatDau: '',
       gioKetThuc: '',
       giaCoSo: '',
     });
     this.isModalOpen = true;
+    this.updateStartTimeValidator();
   }
 
   // openEditModal(slot: SuatChieu) {
@@ -325,18 +420,19 @@ export class ShowtimeSessionListComponent implements OnInit {
 
     this.selectedCinemaId = String(slot.maRap);
     this.selectedRoomId = String(slot.maPhong);
-    this.selectedDate = slot.ngayBatDau;
+    this.selectedDate = slot.ngayChieu;
 
 
     this.isModalOpen = true;
 
 
     this.slotForm.patchValue({
+
       maPhim: slot.maPhim,
       dinhDang: slot.dinhDang,
       hinhThucDich: slot.hinhThucDich,
-      ngayBatDau: slot.ngayBatDau,
-      ngayKetThuc: slot.ngayKetThuc,
+      ngayChieu: slot.ngayChieu,
+      // ngayKetThuc: slot.ngayKetThuc,
       gioBatDau: slot.gioBatDau,
       gioKetThuc: slot.gioKetThuc,
       giaCoSo: slot.giaCoSo,
@@ -344,6 +440,7 @@ export class ShowtimeSessionListComponent implements OnInit {
     });
 
     this.updateEndTime();
+    this.updateStartTimeValidator();
   }
 
   closeModal() {
@@ -396,8 +493,13 @@ export class ShowtimeSessionListComponent implements OnInit {
   // }
 
   submitSlot() {
+    console.log(this.slotForm.value)
+    console.log(this.selectedRoomId)
+
     if (this.slotForm.invalid) {
       this.slotForm.markAllAsTouched();
+      this.showToaster('Vui lòng điền đầy đủ và chính xác thông tin suất chiếu.', 'error');
+      alert('Vui lòng điền đầy đủ và chính xác thông tin suất chiếu.');
       return;
     }
 
@@ -405,26 +507,31 @@ export class ShowtimeSessionListComponent implements OnInit {
     const rid = Number(this.selectedRoomId);
     const date = this.selectedDate;
     if (!cid || !rid || !date) {
+      this.showToaster('Thiếu rạp chiếu / phòng chiếu / ngày chiếu.', 'error');
       alert('Thiếu rạp chiếu / phòng chiếu / ngày chiếu.');
       return;
     }
 
     // Dùng getRawValue() để lấy giá trị của trường endTime (vì nó là readonly/disabled)
     const value = this.slotForm.getRawValue();
+    // Gán trạng thái mặc định là 'Sắp chiếu' hoặc dùng hàm tính toán
+    const status = this.getSlotStatus({ ngayChieu: date } as SuatChieu);
+   
 
     // Payload cần ánh xạ tới SuatChieuDto của BE
     const payload: Omit<SuatChieu, 'id'> = {
-    maRap: cid,
-    maPhong: rid,
-    maPhim: Number(value.maPhim),
-    ngayBatDau: date,        // <--- SỬA
-    ngayKetThuc: value.ngayKetThuc,      // <--- SỬA
-    dinhDang: value.dinhDang,            // <--- SỬA
-    hinhThucDich: value.hinhThucDich,    // <--- SỬA
-    gioBatDau: value.gioBatDau,          // <--- SỬA
-    gioKetThuc: value.gioKetThuc,        // <--- SỬA
-    trangThai: value.trangThai,          
-    giaCoSo: Number(value.giaCoSo)
+      maRap: cid,
+      maPhong: rid,
+      maPhim: Number(value.maPhim),
+      ngayChieu: date,        // <--- SỬA
+      // ngayKetThuc: value.ngayKetThuc,      
+      dinhDang: value.dinhDang,            // <--- SỬA
+      hinhThucDich: value.hinhThucDich,    // <--- SỬA
+      gioBatDau: value.gioBatDau,          // <--- SỬA
+      gioKetThuc: value.gioKetThuc,        // <--- SỬA
+      // trangThai: value.trangThai, 
+      trangThai: status,
+      giaCoSo: Number(value.giaCoSo)
     };
 
     if (this.isEditing && this.editingSlot) {
@@ -432,6 +539,7 @@ export class ShowtimeSessionListComponent implements OnInit {
       const slotId = this.editingSlot.id; // <--- CÓ PHẢI NÓ LÀ undefined KHÔNG?
 
       if (!slotId) {
+        this.showToaster('Lỗi: Không tìm thấy ID suất chiếu đang chỉnh sửa.', 'error');
         alert('Lỗi: Không tìm thấy ID suất chiếu đang chỉnh sửa.');
         return;
       }
@@ -444,27 +552,35 @@ export class ShowtimeSessionListComponent implements OnInit {
             if (index > -1) {
               this.suatChieu[index] = updatedSlot;
             }
+            this.showToaster('Cập nhật suất chiếu thành công!', 'success'); // TOASTER SUCCESS
             this.closeModal();
+            alert( 'Cập nhật suất chiếu thành công!');
           },
           error: (error: HttpErrorResponse) => {
-            console.error('Lỗi khi cập nhật suất chiếu:', error);
-            alert(`Cập nhật thất bại: ${error.error.message || error.statusText}`);
+            const errorMessage = error.error?.message || error.statusText;
+            this.showToaster(errorMessage, 'error');
+            alert( errorMessage);
           }
         });
     } else {
+      console.error('Thêm suất chiếuu:');
+      console.error(payload);
       // 2. CHỨC NĂNG TẠO MỚI (API: POST)
       this.showtimeService.createSlot(payload)
         .subscribe({
           next: (newSlot) => {
             // Thêm bản ghi mới (có ID thật) vào mảng FE
             this.suatChieu.push(newSlot);
+            this.showToaster('Tạo suất chiếu mới thành công!', 'success'); // TOASTER SUCCESS
             this.closeModal();
             // Lọc lại hoặc gọi applyFilters() nếu cần thiết
             // this.applyFilters(); 
           },
           error: (error: HttpErrorResponse) => {
             console.error('Lỗi khi tạo suất chiếu:', error);
-            alert(`Tạo mới thất bại: ${error.error.message || error.statusText}`);
+            const errorMessage = error.error?.message || error.statusText;
+            this.showToaster(errorMessage, 'error');
+            alert( errorMessage);
           }
         });
     }

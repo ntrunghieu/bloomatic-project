@@ -109,7 +109,7 @@
               <!-- <span class="badge" [ngClass]="slotTypeClass(s.slotType)">
                 {{ s.slotType }}
               </span> -->
-              <span class="badge" >
+              <span class="badge">
                 {{ s.giaCoSo | currency:'VND':'symbol':'1.0-0':'vi-VN'}}
               </span>
             </td>
@@ -192,6 +192,7 @@
 
     <form [formGroup]="slotForm" (ngSubmit)="submitSlot()">
       <div class="modal-body">
+
         <div class="field-group">
           <label class="field-label">
             Phim chiếu <span class="required">*</span>
@@ -209,17 +210,18 @@
 
         <div class="field-group">
           <label class="field-label">
-            Ngày bắt đầu
+            Ngày chiếu
           </label>
           <input type="date" class="field-input" [value]="selectedDate" disabled />
+
         </div>
 
-        <div class="field-group">
+        <!-- <div class="field-group">
           <label class="field-label">
             Ngày kết thúc
           </label>
           <input type="date" class="field-input" formControlName="ngayKetThuc" />
-        </div>
+        </div> -->
 
         <div class="field-group">
           <label class="field-label">Hình thức chiếu</label>
@@ -232,7 +234,7 @@
 
         <div class="field-group">
           <label class="field-label">Hình thức dịch</label>
-          <select class="field-input" formControlName="hinhThucDich">
+          <select class="field-input" formControlName="hinhThucDich" >
             <option value="Phụ đề">Phụ đề</option>
             <option value="Thuyết minh">Thuyết minh</option>
           </select>
@@ -244,6 +246,14 @@
               Thời gian bắt đầu <span class="required">*</span>
             </label>
             <input type="time" class="field-input" formControlName="gioBatDau" />
+            <div *ngIf="slotForm.get('gioBatDau')?.hasError('startTimePast') && slotForm.get('gioBatDau')?.touched"
+              class="error-message">
+              Giờ bắt đầu không được nhỏ hơn giờ hiện tại trong ngày hôm nay.
+            </div>
+            <div *ngIf="slotForm.get('gioBatDau')?.hasError('required') && slotForm.get('gioBatDau')?.touched"
+              class="error-message">
+              Vui lòng nhập giờ bắt đầu.
+            </div>
           </div>
 
           <div class="field-group">

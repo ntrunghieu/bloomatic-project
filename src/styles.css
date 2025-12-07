@@ -1,2 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 @import "@ng-select/ng-select/themes/default.theme.css";
+
+app-toaster-component {
+    /* Đảm bảo nó luôn nằm ở một vị trí cố định trên màn hình */
+    position: fixed; 
+    top: 20px; 
+    right: 20px;
+    
+    /* Z-Index rất quan trọng: Đặt nó là giá trị cao nhất */
+    z-index: 99999; 
+}

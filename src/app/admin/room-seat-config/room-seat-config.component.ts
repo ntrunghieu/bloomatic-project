@@ -1,12 +1,14 @@
 // src/app/admin/room-seat-config/room-seat-config.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminRoom } from '../room-list/room-list.component';
 import { GheLayoutDto, SeatConfigService } from '../../services/seat-config/seat-config.service';
 
 type loaiGhe = 'EMPTY' | 'STANDARD' | 'VIP' | 'COUPLE' | 'BLOCK';
 type loaiPhong = '2D' | '3D' | 'IMAX' | 'VIP';
+
+
 
 interface SeatCell {
   nhanGhe: string;
@@ -38,7 +40,9 @@ export class RoomSeatConfigComponent {
   previousCinemaId: number | null = null;
   isDragging = false;
 
-  constructor(private router: Router, private route: ActivatedRoute, private seatConfigService: SeatConfigService,) {
+  constructor(private router: Router, private route: ActivatedRoute, 
+              private seatConfigService: SeatConfigService,
+              private cdr: ChangeDetectorRef) {
 
     const maPhongTuUrl = Number(this.route.snapshot.paramMap.get('maPhong'));
     const idPhong = maPhongTuUrl > 0 ? maPhongTuUrl : 0;
@@ -166,7 +170,7 @@ export class RoomSeatConfigComponent {
       for (let c = 0; c < this.room.cot; c++) {
         row.push({
           nhanGhe: `${rowLetter}${c + 1}`,
-          loaiGhe: 'STANDARD', // hoặc 'EMPTY' nếu muốn mặc định không ghế
+          loaiGhe: 'EMPTY', // hoặc 'EMPTY' nếu muốn mặc định không ghế
           nhomCouple: null,
           coupleRole: null,
         });
@@ -409,6 +413,31 @@ export class RoomSeatConfigComponent {
       error: (err) => {
         console.error('Lỗi lưu cấu hình ghế', err);
         alert('Lưu cấu hình ghế thất bại, vui lòng thử lại.');
+      },
+    });
+  }
+
+  resetConfig() {
+    if (!this.room?.maPhong) {
+      alert('Không xác định được phòng chiếu.');
+      return;
+    }
+
+    if (!confirm('Bạn có chắc chắn muốn XÓA TOÀN BỘ cấu hình ghế của phòng này không? Hành động này không thể hoàn tác!')) {
+      return;
+    }
+
+    // 1. GỌI API DELETE
+    this.seatConfigService.deleteLayout(this.room.maPhong).subscribe({
+      next: () => {
+        alert('Reset cấu hình ghế thành công! Phòng đã trở về trạng thái mặc định.');
+        this.buildGrid(); // Tái tạo lưới ghế với trạng thái mặc định
+        this.selectedSeatType = 'STANDARD';   
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Lỗi reset cấu hình ghế', err);
+        alert('Reset cấu hình ghế thất bại, vui lòng kiểm tra kết nối.');
       },
     });
   }
